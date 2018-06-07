@@ -21,3 +21,9 @@ Basically I wanted to experiment with SSLSockets, Swing and animated GIF, reinve
 -----------------------------------------
 
 **Note**: None of the images used are mine, I picked them somewhere in the Internet. I will try to credit the authors as soon as possible.
+
+Cat upside down - [iconka.com](http://iconka.com/)
+
+Other icons from [icons8.com](https://icons8.com/icon/5415/paste)
+
+[Smiley with sunglasses](https://www.zazzle.com/cool_smiley_face_with_sunglasses_classic_round_sticker-217384233511350916) 
