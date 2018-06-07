@@ -30,6 +30,6 @@ hs_err_pid*
 
 # project stuff
 logs/
-resources/
+toybox/
 ssl.key
 config.xml

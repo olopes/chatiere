@@ -47,7 +47,7 @@ public class ChatoResourceManager implements ResourceManager {
 	File resourceFolder;
 
 	public ChatoResourceManager() {
-		resourceFolder = new File("resources");
+		resourceFolder = new File("toybox");
 		resourceFolder.mkdirs();
 	}
 
