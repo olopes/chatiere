@@ -18,9 +18,44 @@ Basically I wanted to experiment with SSLSockets, Swing and animated GIF, reinve
 
 [By the way, I'm and engineer, so don't expect a fancy Interface.](http://dilbert.com/strip/2002-09-24)
 
------------------------------------------
+## Build and run
 
-**Note**: None of the images used are mine, I picked them somewhere in the Internet. I will try to credit the authors as soon as possible.
+You will need git, jdk7 and maven.
+
+Clone the repository:
+```sh
+git clone https://github.com/olopes/chatiere.git
+```
+
+Build it:
+```sh
+cd chatiere
+mvn package
+```
+
+When the build finishes, open the chatte folder:
+```sh
+cd chatte
+```
+
+Generate a self-signed RSA certificate if you need to. Store name and password must be ssl.key unless you change the code.
+```sh
+keytool -genkey -alias ssl.key -keyalg RSA -keypass ssl.key -storepass ssl.key -keystore ssl.key
+```
+
+Run it!
+```sh
+java -jar target/chatte-0.0.1-SNAPSHOT.jar
+```
+or
+```sh
+java -cp target/chatte-0.0.1-SNAPSHOT.jar chatte.Chatte
+```
+
+Manualy to a friend for the first time by clicking "settings" icon and then typing your friend's host name and port. Currently both friends must be sharing the same SSL key, ie, the same self-signed certificate generated before.
+
+### Notes
+None of the images used are mine, I picked them somewhere in the Internet. I will try to credit the authors as soon as possible.
 
 Cat upside down - [iconka.com](http://iconka.com/)
 
