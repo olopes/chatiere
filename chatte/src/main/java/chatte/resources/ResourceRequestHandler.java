@@ -25,6 +25,7 @@
 package chatte.resources;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import chatte.msg.MessageBroker;
 import chatte.msg.MessageListener;
@@ -35,7 +36,11 @@ import chatte.msg.ResourceUpdatedMessage;
 public class ResourceRequestHandler {
 	ResourceManager resourceManager;
 	MessageBroker messageBroker;
-	
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
+
 	public ResourceRequestHandler(ResourceManager resourceManager, MessageBroker messageBroker) {
 		this.messageBroker = messageBroker;
 		this.resourceManager = resourceManager;
@@ -61,7 +66,7 @@ public class ResourceRequestHandler {
 	
 	@MessageListener
 	public void sendResource(ResourceMessage message) {
-		System.out.println("New resource!! heheheheh!");
+		log.fine("New resource!! heheheheh!");
 		if(message.isRemote()) {
 			String newResource = resourceManager.addResource(message.getContents(), message.getType());
 			messageBroker.sendMessage(new ResourceUpdatedMessage(message.getFrom(), newResource));

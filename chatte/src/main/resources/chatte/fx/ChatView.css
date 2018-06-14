@@ -22,35 +22,59 @@
  * SOFTWARE.
  * 
  */
-package chatte.net;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.util.logging.Logger;
+body {
+	font-family: OpenSansEmoji;
+	font-size: 10pt;
+	color: black;
+}
 
-import chatte.resources.ResourceManager;
+h1 {
+	font-family: OpenSansEmoji;
+	font-size: 12pt;
+	font-weight: bold;
+}
 
-public class ChatoURLStreamHandler extends URLStreamHandler {
-	
-	private ResourceManager resourceManager;
-	private Logger log = getLogger();
-	Logger getLogger() {
-		return Logger.getLogger(getClass().getName());
-	}
+div {
+	margin-top: 0px;
+}
+/*
+hr {
+	border: 0px;
+	width: 90%;
+	color: #333;
+	height: 1px;
+	background-color: #333333;
+	margin: 0px;
+	margin: 0px;
+}
 
-	public ChatoURLStreamHandler(ResourceManager resourceManager) {
-		this.resourceManager = resourceManager;
-	}
+.rule {
+	height: 1px;
+	border-bottom: 1px solid #333333;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+*/
+.even {
+	background-color: #fcfcfc;
+}
 
-	@Override
-	protected URLConnection openConnection(URL u) throws IOException {
-		log.fine("Opening connection to 'chato' url: "+u);
-		URL url = resourceManager.getResourceURL(u.getFile());
-		if(url != null)
-			return url.openConnection();
-		return null;
-	}
+.odd {
+	background-color: #f5f5f5;
+}
 
+.timestamp {
+	color: #999999;
+	text-align: right;
+}
+
+.from0 {
+	color: #a500ff;
+	font-weight: bold;
+	border-top: 1px solid #888888;
+}
+
+.message {
+	color: #333333;
 }

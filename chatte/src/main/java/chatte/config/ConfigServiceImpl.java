@@ -41,15 +41,23 @@ import java.util.Map;
 import chatte.msg.Friend;
 import chatte.msg.MySelf;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class ConfigServiceImpl implements ConfigService {
 
 	private static int DEFAULT_PORT = 6666;
-	
+
 	private MySelf me = new MySelf();
 	private Map<String, Friend> knownFriends;
 
 	public ConfigServiceImpl() {
 		loadConfig();
+	}
+
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
 	}
 
 	void loadConfig() {
@@ -60,7 +68,7 @@ public class ConfigServiceImpl implements ConfigService {
 				Map<String, Friend> readObject = (Map<String, Friend>) decoder.readObject();
 				knownFriends = readObject;
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.log(Level.SEVERE, "Error reading config.xml", e);
 				// TODO handle this....
 			}
 			me = (MySelf) knownFriends.get(me.getHost());
@@ -81,7 +89,7 @@ public class ConfigServiceImpl implements ConfigService {
 		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(cfgFile)))) {
 			encoder.writeObject(knownFriends);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.log(Level.SEVERE, "Error saving config.xml", ex);
 		}
 	}
 
@@ -124,7 +132,7 @@ public class ConfigServiceImpl implements ConfigService {
 	public void addFriend(Friend friend) {
 		if(null == friend) return;
 		String host = fixHost(friend.getHost());
-		System.out.println("Registering new friend with host "+host);
+		log.info("Registering new friend with host "+host);
 		if(me.getHost().equals(host)) {
 			me.setNick(friend.getNick());
 			me.setPort(friend.getPort());
@@ -145,7 +153,7 @@ public class ConfigServiceImpl implements ConfigService {
 		try {
 			return InetAddress.getByName(host).getHostAddress();
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, "Host not found: "+host, e);
 			return null;
 		}
 

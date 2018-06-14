@@ -27,3 +27,5 @@ Cat upside down - [iconka.com](http://iconka.com/)
 Other icons from [icons8.com](https://icons8.com/icon/5415/paste)
 
 [Smiley with sunglasses](https://www.zazzle.com/cool_smiley_face_with_sunglasses_classic_round_sticker-217384233511350916) 
+
+Font OpenSansEmoji from https://github.com/MorbZ/OpenSansEmoji

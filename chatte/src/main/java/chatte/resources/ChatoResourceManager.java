@@ -39,12 +39,18 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.Formatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 public class ChatoResourceManager implements ResourceManager {
 
 	File resourceFolder;
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
 
 	public ChatoResourceManager() {
 		resourceFolder = new File("toybox");
@@ -125,7 +131,7 @@ public class ChatoResourceManager implements ResourceManager {
 			Files.copy(toAdd.toPath(), dest.toPath());
 			return sha1;
 		} catch(Exception e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error adding new resource", e);
 		}
 		return null;
 	}
@@ -151,7 +157,7 @@ public class ChatoResourceManager implements ResourceManager {
 				ImageIO.write((RenderedImage)img, "jpg", f);
 				resource = addResource(f);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.log(Level.SEVERE, "Error saving new image", e);
 			} finally {
 				if(f != null) f.delete();
 			}
@@ -170,7 +176,7 @@ public class ChatoResourceManager implements ResourceManager {
 
 			resource = addResource(f);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error saving received resource", e);
 		} finally {
 			if(f!=null) f.delete();
 		}
@@ -189,7 +195,7 @@ public class ChatoResourceManager implements ResourceManager {
 			while((r = in.read(b)) >= 0)
 				out.write(b, 0, r);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Error reading resource data", e);
 		}
 		return out.toByteArray();
 	}

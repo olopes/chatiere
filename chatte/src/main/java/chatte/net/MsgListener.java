@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -59,7 +61,11 @@ public class MsgListener implements Runnable {
 	Deque<Friend> connectingFriends;
 	Set<String> localAddresses;
 	Thread connectorThread;
-	
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
+
 	private class FriendConnector implements Runnable {
 		@Override
 		public void run() {
@@ -103,13 +109,13 @@ public class MsgListener implements Runnable {
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.log(Level.SEVERE, "Error loading local addresses list", ex);
 		}
 	}
 	
 	
 	void printNetAddresses () {
-		System.out.println("Local addresses: "+this.localAddresses);
+		log.info("Local addresses: "+this.localAddresses);
 	}
 	
 	@Override
@@ -130,7 +136,7 @@ public class MsgListener implements Runnable {
 					Socket socket = server.accept();
 					String host = socket.getInetAddress().getHostAddress();
 					
-					System.out.println("Got a connection from "+host);
+					log.info("Got a connection from "+host);
 					Friend friend = configService.getFriend(host);
 
 					connectedFriends.add(friend);
@@ -138,7 +144,7 @@ public class MsgListener implements Runnable {
 					MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 					new Thread(newWorker,"net client "+host).start();
 				} catch(IOException ex) {
-					ex.printStackTrace();
+					log.log(Level.SEVERE, "Connection error", ex);
 				}
 			}
 			
@@ -155,28 +161,28 @@ public class MsgListener implements Runnable {
 	
 	@MessageListener
 	public void connectNewFriend(NewFriendMessage message) {
-		System.out.println("New friend added "+message.getFriend().getHost());
+		log.fine("New friend added "+message.getFriend().getHost());
 		connectToFriend(message.getFriend());
 	}
 	
 	@MessageListener
 	public void welcomeFriend(WelcomeMessage message) {
-		System.out.println("Hello new friend!");
+		log.fine("Hello new friend!");
 		Friend friend = configService.getFriend(message.getFrom().getHost());
 		friend.setPort(message.getPort());
 		friend.setNick(message.getNick());
 		configService.addFriend(friend);
 		friend.setConnected(true);
-		System.out.println("We are now connected: "+friend);
+		log.fine("We are now connected: "+friend);
 		messageBroker.sendMessage(new ConnectedMessage(friend));
 		if(message.getKnownFriends() != null && !message.getKnownFriends().isEmpty()) {
 			for(Friend newFriend : message.getKnownFriends()) {
 				if(newFriend instanceof MySelf) {
-					System.out.println("WELCOME FRIENDS - Skipping my self...");
+					log.fine("WELCOME FRIENDS - Skipping my self...");
 					continue;
 				}
 				if(this.localAddresses.contains(newFriend.getHost())) {
-					System.out.println("WELCOME FRIENDS - Skipping my onw machine...");
+					log.fine("WELCOME FRIENDS - Skipping my onw machine...");
 					continue;
 				}
 				configService.addFriend(newFriend);
@@ -196,13 +202,13 @@ public class MsgListener implements Runnable {
 	
 	void connectToFriend(Friend friend) {
 		if(null == friend || friend instanceof MySelf || localAddresses.contains(friend.getHost())) {
-			System.out.println("Ignoring local connection");
+			log.fine("Ignoring local connection");
 			return;
 		}
-		System.out.println("Connection to "+friend.getHost()+"...");
+		log.info("Connection to "+friend.getHost()+"...");
 		
 		if(connectedFriends.contains(friend)) {
-			System.out.println("My friend, you are already connected/connecting: "+friend);
+			log.fine("My friend, you are already connected/connecting: "+friend);
 			return;
 		}
 		
@@ -214,8 +220,7 @@ public class MsgListener implements Runnable {
 			workerThread.start();
 		} catch(IOException e) {
 			friend.setConnected(false);
-			System.out.println("Connection to "+friend.getHost()+" failed");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Connection to "+friend.getHost()+" failed", e);
 		}
 		
 	}

@@ -22,35 +22,8 @@
  * SOFTWARE.
  * 
  */
-package chatte.net;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.util.logging.Logger;
-
-import chatte.resources.ResourceManager;
-
-public class ChatoURLStreamHandler extends URLStreamHandler {
-	
-	private ResourceManager resourceManager;
-	private Logger log = getLogger();
-	Logger getLogger() {
-		return Logger.getLogger(getClass().getName());
-	}
-
-	public ChatoURLStreamHandler(ResourceManager resourceManager) {
-		this.resourceManager = resourceManager;
-	}
-
-	@Override
-	protected URLConnection openConnection(URL u) throws IOException {
-		log.fine("Opening connection to 'chato' url: "+u);
-		URL url = resourceManager.getResourceURL(u.getFile());
-		if(url != null)
-			return url.openConnection();
-		return null;
-	}
-
+.root{
+    -fx-font-size: 12pt;
+    -fx-font-family: OpenSansEmoji;
 }

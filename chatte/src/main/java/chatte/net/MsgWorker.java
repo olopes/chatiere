@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import chatte.msg.AbstractMessage;
 import chatte.msg.ChatMessage;
@@ -45,6 +47,10 @@ public class MsgWorker implements Runnable {
 	MsgListener server;
 	MessageBroker messageBroker;
 	Socket sock;
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
 	
 	
 	final Friend me;
@@ -60,17 +66,16 @@ public class MsgWorker implements Runnable {
 		try {
 			out = new ObjectOutputStream(sock.getOutputStream());
 			in = new ObjectInputStream(sock.getInputStream());
-			System.out.println("1. Streams created");
+			log.info("1. Streams created");
 		} catch(Exception e) {
-			System.out.println("Socket stream creation failed");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Socket stream creation failed", e);
 		}
 
 	}
 
 	@MessageListener
 	public void sendTypedMessage(TypedMessage message) {
-		System.out.println("sending message "+message);
+		log.fine("sending message "+message);
 		try {
 			out.writeObject(new ChatMessage(message));
 			out.flush();
@@ -81,7 +86,7 @@ public class MsgWorker implements Runnable {
 	
 	@MessageListener
 	public void sendResourceRequest(ResourceRequestMessage message) {
-		System.out.println("preparing to send message "+message);
+		log.fine("preparing to send message "+message);
 		if(message.getFrom() == me && !message.isRemote()) {
 			try {
 				out.writeObject(message);
@@ -94,7 +99,7 @@ public class MsgWorker implements Runnable {
 	
 	@MessageListener
 	public void sendResource(ResourceMessage message) {
-		System.out.println("preparing to send message "+message);
+		log.fine("preparing to send message "+message);
 		if(message.getFrom() == me && !message.isRemote()) {
 			try {
 				out.writeObject(message);
@@ -106,7 +111,7 @@ public class MsgWorker implements Runnable {
 	}
 	
 	void dispatchMessage(AbstractMessage message) {
-		System.out.println(" => dispatching received message :-D ("+message.getClass().getSimpleName()+")");
+		log.fine(" => dispatching received message :-D ("+message.getClass().getSimpleName()+")");
 		message.setRemote(true);
 		message.setFrom(me);
 		messageBroker.sendMessage(message);
@@ -114,7 +119,7 @@ public class MsgWorker implements Runnable {
 	
 	@Override
 	public void run() {
-		System.out.println("Starting client worker...");
+		log.info("Starting client worker...");
 		messageBroker.addListener(this);
 		try {
 			// protocol negotiation.
@@ -128,27 +133,26 @@ public class MsgWorker implements Runnable {
 			out.writeObject(welcome);
 			out.flush();
 
-			System.out.println("2. Welcome message sent");
+			log.info("2. Welcome message sent");
 			
 			WelcomeMessage greeting = (WelcomeMessage) in.readObject();
-			System.out.println("3. Greeting received");
+			log.info("3. Greeting received");
 			dispatchMessage(greeting);
 			
-			System.out.println("4. Waiting...");
+			log.info("4. Waiting...");
 			while(sock.isConnected()) {
 				try {
 					AbstractMessage message = (AbstractMessage) in.readObject();
 					dispatchMessage(message);
 				} catch(ClassNotFoundException ex) {
-					System.err.println("Bad message type received: "+ex.getMessage());
+					log.log(Level.SEVERE, "Bad message type received: "+ex.getMessage());
 				}
 			}
 			
 		} catch(IOException | ClassNotFoundException e) {
-			System.out.println("Something bad happened....");
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Something bad happened....", e);
 		} finally {
-			System.out.println("4. Disconnected.");
+			log.info("4. Disconnected.");
 			messageBroker.removeListener(this);
 			messageBroker.sendMessage(new DisconnectedMessage(me));
 		}

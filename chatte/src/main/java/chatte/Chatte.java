@@ -24,54 +24,19 @@
  */
 package chatte;
 
-import java.net.URL;
-
-import javax.swing.SwingUtilities;
-
-import chatte.config.ConfigService;
-import chatte.config.ConfigServiceImpl;
-import chatte.msg.ChatoMessageBroker;
-import chatte.msg.MessageBroker;
-import chatte.net.ChatoURLStreamHandlerFactory;
-import chatte.net.MsgListener;
-import chatte.resources.ChatoResourceManager;
-import chatte.resources.ResourceManager;
-import chatte.resources.ResourceRequestHandler;
-import chatte.ui.ChatFrame;
+import chatte.fx.ChatteFX;
 
 public class Chatte {
 	
 	public static void main(String[] args) {
+		
 		// Configure SSL context
 		System.setProperty("javax.net.ssl.keyStore","ssl.key");
 		System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
 		System.setProperty("javax.net.ssl.trustStore","ssl.key");
 		System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
 		
-		final ConfigService configService = new ConfigServiceImpl();
-		final ResourceManager resourceManager = new ChatoResourceManager();
-		final MessageBroker messageBroker = new ChatoMessageBroker(resourceManager);
-		final ResourceRequestHandler resourceRequestHandler = new ResourceRequestHandler(resourceManager, messageBroker);
-		messageBroker.addListener(resourceRequestHandler);
-
-		// Register URL handler factory
-		URL.setURLStreamHandlerFactory(new ChatoURLStreamHandlerFactory(resourceManager));
-		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-//				try {
-//					javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-//				} catch (Exception e) {
-//				}
-				ChatFrame blah = new ChatFrame(resourceManager, messageBroker, configService);
-				
-				// start server
-				Thread t = new Thread(new MsgListener(messageBroker, configService), "network service");
-				t.start();
-
-				blah.setVisible(true);
-			}
-		});
+		ChatteFX.main(args);
 	}
 
 }
