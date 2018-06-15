@@ -32,7 +32,6 @@ import chatte.config.ConfigService;
 import chatte.msg.ChatMessage;
 import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
-import chatte.msg.MessageListener;
 import chatte.msg.TypedMessage;
 import chatte.resources.ResourceManager;
 import javafx.application.Platform;
@@ -123,20 +122,19 @@ public class ChatteController implements Initializable {
 		this.messageBroker.sendMessage(new TypedMessage(me, txtData, null));
 	}
 	
-	@MessageListener
+	@FXML 
+	void doExit(ActionEvent event) {
+		log.info("Close menuitem clicked");
+		Platform.exit();
+	}
+	
 	public void messageTyped(TypedMessage msg) {
 		chatMessageReceived(new ChatMessage(msg));
 	}
 	
-	@MessageListener
 	public void chatMessageReceived(final ChatMessage message) {
-		// ask to run in JavaFX thread
-		Platform.runLater(new Runnable(){
-			public void run() {
-				WebEngine engine = webView.getEngine();
-				JSObject displayMessage = (JSObject) engine.executeScript("window");
-				displayMessage.call("displayMessage", message);
-			}
-		});
+		WebEngine engine = webView.getEngine();
+		JSObject displayMessage = (JSObject) engine.executeScript("window");
+		displayMessage.call("displayMessage", message);
 	}
 }

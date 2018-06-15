@@ -39,7 +39,7 @@ SOFTWARE.
 			<menus>
 				<Menu mnemonicParsing="false" text="%menu.file">
 					<items>
-						<MenuItem mnemonicParsing="false" text="%menuitem.close" />
+						<MenuItem mnemonicParsing="false" text="%menuitem.close" onAction="#doExit"/>
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.edit">

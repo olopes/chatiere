@@ -27,15 +27,8 @@ package chatte;
 import chatte.fx.ChatteFX;
 
 public class Chatte {
-	
+
 	public static void main(String[] args) {
-		
-		// Configure SSL context
-		System.setProperty("javax.net.ssl.keyStore","ssl.key");
-		System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.trustStore","ssl.key");
-		System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
-		
 		ChatteFX.main(args);
 	}
 
