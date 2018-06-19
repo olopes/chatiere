@@ -61,7 +61,8 @@ public class ChatteFX extends Application {
 	ResourceManager resourceManager;
 	ConfigService configService;
 	ResourceBundle resources;
-
+	ControllerFactory controllerFactory;
+	
 	public static void main(String [] args) {
 		// Configure SSL context
 		System.setProperty("javax.net.ssl.keyStore","ssl.key");
@@ -107,27 +108,44 @@ public class ChatteFX extends Application {
 		// start network listener
 		// new Thread(new chatte.net.MsgListener(messageBroker, configService), "MsgListener").start();
 		
+		controllerFactory = new ControllerFactory(configService, resourceManager, messageBroker);
+		
 		// register "custom" font
 		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12);
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(final Stage primaryStage) throws Exception {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resources);
+		loader.setControllerFactory(controllerFactory);
 		Parent root = (Parent)loader.load();
 		ChatteController controller = loader.getController();
-		controller.configure(configService, resourceManager, messageBroker);
+		controller.setStage(primaryStage);
+		
 
 		// register UI message listener
 		messageBroker.addListener(new UIMessageListener(controller));
 
 		Scene scene = new Scene(root);
-		scene.getStylesheets().add(getClass().getResource("ChatteFX.css").toExternalForm());
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
 				log.fine("Window close request");
+				ChatteDialog dialog = new ChatteDialog(
+						primaryStage,
+						resources.getString("dialog.close.title"),
+						resources.getString("dialog.close.message"),
+						new String [] {
+								resources.getString("dialog.close.cancel"),
+								resources.getString("dialog.close.exit"),
+						}
+						);
+				int selected = dialog.showDialog();
+				if(selected != 1) {
+					// exit was not selected. Consume the event to prevent window from closing
+					event.consume();
+				}
 			}
 		});
 		primaryStage.setTitle("ChatteFX");

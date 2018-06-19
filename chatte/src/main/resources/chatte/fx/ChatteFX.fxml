@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- 
 MIT License
 
@@ -22,24 +23,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  -->
+
 <?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
+<?import java.net.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
-	minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0"
-	prefWidth="855.0" xmlns="http://javafx.com/javafx/8"
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="chatte.fx.ChatteController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.fx.ChatteController">
+<stylesheets>
+	<URL value="@ChatteFX.css" />
+</stylesheets>
 	<top>
 		<MenuBar BorderPane.alignment="CENTER">
 			<menus>
 				<Menu mnemonicParsing="false" text="%menu.file">
 					<items>
-						<MenuItem mnemonicParsing="false" text="%menuitem.close" onAction="#doExit"/>
+						<MenuItem mnemonicParsing="false" onAction="#doExit" text="%menuitem.close" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.edit">
@@ -56,121 +58,55 @@ SOFTWARE.
 		</MenuBar>
 	</top>
 	<center>
-		<SplitPane dividerPositions="0.2" prefHeight="200.0"
-			prefWidth="200.0">
+		<SplitPane dividerPositions="0.2" prefHeight="200.0" prefWidth="200.0">
 			<items>
-				<ListView fx:id="listView" prefHeight="398.0"
-					prefWidth="96.0" />
-				<SplitPane dividerPositions="0.8" orientation="VERTICAL"
-					prefHeight="472.0" prefWidth="474.0">
+				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" />
+				<SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="472.0" prefWidth="474.0">
 					<items>
-						<WebView fx:id="webView" prefHeight="200.0"
-							prefWidth="200.0" />
-						<BorderPane minHeight="100.0" prefHeight="200.0"
-							prefWidth="200.0">
+						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />
+						<BorderPane minHeight="100.0" prefHeight="200.0" prefWidth="200.0">
 							<center>
-								<WebView fx:id="inputArea"
-									onKeyPressed="#checkKeyPressed" prefHeight="200.0"
-									prefWidth="506.0" BorderPane.alignment="CENTER" />
+								<WebView fx:id="inputArea" onKeyPressed="#checkKeyPressed" prefHeight="200.0" prefWidth="506.0" BorderPane.alignment="CENTER" />
 							</center>
 							<top>
-								<ToolBar prefHeight="40.0" prefWidth="200.0"
-									BorderPane.alignment="CENTER">
+								<ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 									<items>
-										<Button fx:id="preferencesBtn" mnemonicParsing="false">
+										<Button fx:id="preferencesBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.prefs">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.prefs" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/setup.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
-										<Button fx:id="emoticonBtn" mnemonicParsing="false">
+										<Button fx:id="emoticonBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.emoticon">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.emoticon" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/emoji.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
-										<Button fx:id="addImgBtn" mnemonicParsing="false">
+										<Button fx:id="addImgBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.addimg">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.addimg" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/add.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
-										<Button fx:id="pasteBtn" mnemonicParsing="false">
+										<Button fx:id="pasteBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.paste" onAction="#doPasteImage">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.paste" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/paste.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
-										<Button fx:id="snipBtn" mnemonicParsing="false">
+										<Button fx:id="snipBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.snip">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.snip" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/snip.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
 										<Region fx:id="leftSpring" />
-										<Button fx:id="clsBtn" mnemonicParsing="false"
-											text="%btn.cls">
+										<Button fx:id="clsBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.cls" onAction="#doPanic">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.cls" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/cls.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
 										<Region fx:id="rightSpring" />
-										<Button fx:id="sendBtn" mnemonicParsing="false"
-											text="%btn.send">
+										<Button fx:id="sendBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.send">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.send" />
 											</tooltip>
-											<graphic>
-												<ImageView fitHeight="24.0" fitWidth="24.0"
-													pickOnBounds="true" preserveRatio="true">
-													<image>
-												        <Image url="@icon/send.png"/>
-												    </image>
-												</ImageView>
-											</graphic>
 										</Button>
 									</items>
 								</ToolBar>

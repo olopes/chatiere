@@ -32,14 +32,21 @@ function displayMessage(msg) {
 	var msglist, msgEl;
 	if(!msg) return;
 	msglist = document.getElementById('msglist');
-	if(!msglist) return;
 	msgEl = document.createElement('DIV');
 	msgEl.innerHTML = msg.getMessage();
 	msglist.appendChild(msgEl);
 }
+function clearScreen() {
+	// faster than msglist.innerHTML=''
+	// https://jsperf.com/innerhtml-vs-removechild/15
+	var msglist = document.getElementById('msglist');
+	while (msglist.firstChild) {
+		msglist.removeChild(msglist.firstChild);
+	}
+}
 </script>
 </head>
-<body id="home">
+<body>
 <h1>Welcome Grande Chato</h1>
 <div id="msglist"></div>
 </body>

@@ -24,9 +24,13 @@
  */
 package chatte.fx;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
 
 import chatte.config.ConfigService;
 import chatte.msg.ChatMessage;
@@ -34,12 +38,15 @@ import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
 import chatte.msg.TypedMessage;
 import chatte.resources.ResourceManager;
-import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -47,9 +54,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 
 public class ChatteController implements Initializable {
+	// components injected by FXML
+	
 	// Views
 	@FXML ListView<Friend> listView;
 	@FXML WebView webView;
@@ -66,17 +76,21 @@ public class ChatteController implements Initializable {
 	@FXML Button sendBtn;
 	@FXML Button snipBtn;
 	
+	// class specific stuff
+	Stage stage;
 	ResourceBundle bundle;
 	Friend me;
 	MessageBroker messageBroker;
+	ResourceManager resourceManager;
 	
 	private Logger log = getLogger();
 	Logger getLogger() {
 		return Logger.getLogger(getClass().getName());
 	}
 
-	public void configure(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+	public ChatteController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
 		this.messageBroker=messageBroker;
+		this.resourceManager = resourceManager;
 		me = configService.getSelf();
 		this.messageBroker.addListener(this);
 	}
@@ -98,11 +112,17 @@ public class ChatteController implements Initializable {
 		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm());
 	}
 
-	@FXML 
-	void sendButtonClick(ActionEvent event) {
-		doSendMessage();
+	void doSendMessage() {
+		WebEngine engine = inputArea.getEngine();
+		String txtData = (String) engine.executeScript("document.body.innerHTML");
+		// HTMLElement body = (HTMLElement) engine.getDocument().getElementsByTagName("body").item(0);
+		log.fine(txtData);
+		engine.executeScript("document.body.innerHTML=''");
+		this.messageBroker.sendMessage(new TypedMessage(me, txtData, null));
 	}
-
+	
+	// input
+	
 	@FXML 
 	void checkKeyPressed(KeyEvent event) {
 		if (event.getCode() == KeyCode.ENTER) {
@@ -113,19 +133,68 @@ public class ChatteController implements Initializable {
 		}
 	}
 	
-	void doSendMessage() {
-		WebEngine engine = inputArea.getEngine();
-		String txtData = (String) engine.executeScript("document.body.innerHTML");
-		// HTMLElement body = (HTMLElement) engine.getDocument().getElementsByTagName("body").item(0);
-		log.fine(txtData);
-		engine.executeScript("document.body.innerHTML=''");
-		this.messageBroker.sendMessage(new TypedMessage(me, txtData, null));
-	}
+	// Menu actions
 	
 	@FXML 
 	void doExit(ActionEvent event) {
-		log.info("Close menuitem clicked");
-		Platform.exit();
+		log.fine("Window close request");
+		ChatteDialog dialog = new ChatteDialog(
+				stage,
+				bundle.getString("dialog.close.title"),
+				bundle.getString("dialog.close.message"),
+				new String [] {
+						bundle.getString("dialog.close.cancel"),
+						bundle.getString("dialog.close.exit"),
+				}
+				);
+		int selected = dialog.showDialog();
+		if(selected == 1) {
+			stage.close();
+		}
+
+	}
+	
+	// Toolbar button actions
+	
+	@FXML
+	void doPasteImage(ActionEvent event) {
+		Clipboard clipboard = Clipboard.getSystemClipboard();
+		if(clipboard.hasContent(DataFormat.IMAGE)) {
+			try {
+				Image image = clipboard.getImage();
+				java.awt.image.BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+				File tempFile = File.createTempFile("tmp_", ".png");
+				ImageIO.write(bufferedImage, "png", tempFile);
+				String resource = resourceManager.addResource(tempFile);
+				tempFile.delete();
+
+				appendInputImage(resource);
+			} catch(Exception e) {
+				log.log(Level.SEVERE, "Error copying image from clipboard", e);
+			}
+		}
+		inputArea.requestFocus();
+	}
+	
+	@FXML
+	void doPanic(ActionEvent event) {
+		WebEngine engine = webView.getEngine();
+		JSObject htmlWindow = (JSObject) engine.executeScript("window");
+		htmlWindow.call("clearScreen");
+		stage.setIconified(true);
+		inputArea.requestFocus();
+	}
+	
+	@FXML 
+	void doSend(ActionEvent event) {
+		doSendMessage();
+		inputArea.requestFocus();
+	}
+
+	public void appendInputImage(String resourceCode) {
+		WebEngine engine = inputArea.getEngine();
+		JSObject htmlWindow = (JSObject) engine.executeScript("window");
+		htmlWindow.call("appendImage", resourceCode);
 	}
 	
 	public void messageTyped(TypedMessage msg) {
@@ -134,7 +203,17 @@ public class ChatteController implements Initializable {
 	
 	public void chatMessageReceived(final ChatMessage message) {
 		WebEngine engine = webView.getEngine();
-		JSObject displayMessage = (JSObject) engine.executeScript("window");
-		displayMessage.call("displayMessage", message);
+		JSObject htmlWindow = (JSObject) engine.executeScript("window");
+		htmlWindow.call("displayMessage", message);
+		stage.toFront();
 	}
+
+	public Stage getStage() {
+		return stage;
+	}
+
+	public void setStage(Stage stage) {
+		this.stage = stage;
+	}
+
 }
