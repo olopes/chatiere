@@ -8,6 +8,7 @@ Chaton will be the application launcher that will support auto-updates and such.
 ## Chatte
 Chatte - pun intended - is the main chat application. The key features are:
 
+ * **NOT YET COMPLETE! THIS BRANCH DOESN'T WORK FOR THE MOMENT!**
  * Fun with JavaFX2 
  * Decentralized architecture
  * Secured connection (SSL)
