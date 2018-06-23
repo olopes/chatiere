@@ -43,7 +43,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -60,7 +59,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 
 public class ChatteController implements Initializable {
@@ -174,13 +172,6 @@ public class ChatteController implements Initializable {
 		if(pickerStage == null) {
 			pickerStage = new Stage();
 			pickerStage.initOwner(mainWindow);
-			pickerStage.setOnHidden(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent event) {
-					pickerStage=null;
-					pickerView = null;
-				}
-			});
 			pickerView = new WebView();
 
 			pickerStage.setScene(new Scene(pickerView, 640, 400));
