@@ -81,7 +81,7 @@ SOFTWARE.
 												<Tooltip text="%tooltip.btn.emoticon" />
 											</tooltip>
 										</Button>
-										<Button fx:id="addImgBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.addimg">
+										<Button fx:id="addImgBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.addimg" onAction="#doAddImage">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.addimg" />
 											</tooltip>

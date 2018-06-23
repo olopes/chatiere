@@ -200,4 +200,9 @@ public class ChatoResourceManager implements ResourceManager {
 		return out.toByteArray();
 	}
 	
+	@Override
+	public String[] getValidFileExtensions() {
+		return new String [] {"*.gif","*.jpg","*.png",};
+	}
+	
 }

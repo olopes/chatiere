@@ -46,4 +46,6 @@ public interface ResourceManager {
 	
 	byte [] getResourceData(String resourceCode);
 
+	String[] getValidFileExtensions();
+
 }

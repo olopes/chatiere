@@ -58,6 +58,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 
@@ -195,6 +197,20 @@ public class ChatteController implements Initializable {
 		pickerStage.show();
 	}
 
+	
+	@FXML
+	void doAddImage(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(bundle.getString("dialog.addEmoticon.title"));
+		fileChooser.getExtensionFilters().add(new ExtensionFilter(bundle.getString("dialog.addEmoticon.filter"), resourceManager.getValidFileExtensions()));
+		File selected = fileChooser.showOpenDialog(mainWindow);
+		if(selected != null) {
+			String newResource = resourceManager.addResource(selected);
+			if(newResource != null)
+				appendInputImage(newResource);
+		}
+	}
+	
 	@FXML
 	void doPasteImage(ActionEvent event) {
 		Clipboard clipboard = Clipboard.getSystemClipboard();
