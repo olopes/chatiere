@@ -112,10 +112,12 @@ public class ChatteController implements Initializable {
 		HBox.setHgrow(rightSpring, Priority.ALWAYS);
 		
 		WebEngine engine = inputArea.getEngine();
+		inputArea.setContextMenuEnabled(false);
 		engine.setJavaScriptEnabled(true);
 		engine.load(getClass().getResource("InputView.html").toExternalForm());
 		
 		WebEngine viewEngine = webView.getEngine();
+		webView.setContextMenuEnabled(false);
 		viewEngine.setJavaScriptEnabled(true);
 		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm());
 	}
@@ -175,7 +177,8 @@ public class ChatteController implements Initializable {
 			pickerStage = new Stage();
 			pickerStage.initOwner(mainWindow);
 			pickerView = new WebView();
-
+			pickerView.setContextMenuEnabled(false);
+			
 			pickerStage.setScene(new Scene(pickerView, 640, 400));
 
 			WebEngine engine = pickerView.getEngine();
