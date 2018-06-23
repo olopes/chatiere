@@ -38,10 +38,15 @@ import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
 import chatte.msg.TypedMessage;
 import chatte.resources.ResourceManager;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -55,6 +60,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import netscape.javascript.JSObject;
 
 public class ChatteController implements Initializable {
@@ -77,7 +83,9 @@ public class ChatteController implements Initializable {
 	@FXML Button snipBtn;
 	
 	// class specific stuff
-	Stage stage;
+	Stage mainWindow;
+	Stage pickerStage;
+	WebView pickerView;
 	ResourceBundle bundle;
 	Friend me;
 	MessageBroker messageBroker;
@@ -139,7 +147,7 @@ public class ChatteController implements Initializable {
 	void doExit(ActionEvent event) {
 		log.fine("Window close request");
 		ChatteDialog dialog = new ChatteDialog(
-				stage,
+				mainWindow,
 				bundle.getString("dialog.close.title"),
 				bundle.getString("dialog.close.message"),
 				new String [] {
@@ -149,13 +157,53 @@ public class ChatteController implements Initializable {
 				);
 		int selected = dialog.showDialog();
 		if(selected == 1) {
-			stage.close();
+			mainWindow.close();
 		}
 
 	}
 	
 	// Toolbar button actions
 	
+	@FXML
+	void doOpenPreferences(ActionEvent event) {
+		
+	}
+	
+	@FXML
+	void doOpenEmoticonPanel(ActionEvent event) {
+		if(pickerStage == null) {
+			pickerStage = new Stage();
+			pickerStage.initOwner(mainWindow);
+			pickerStage.setOnHidden(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+					pickerStage=null;
+					pickerView = null;
+				}
+			});
+			pickerView = new WebView();
+
+			pickerStage.setScene(new Scene(pickerView, 640, 400));
+
+			WebEngine engine = pickerView.getEngine();
+			engine.setJavaScriptEnabled(true);
+			engine.getLoadWorker().stateProperty().addListener(
+					new ChangeListener<State>() {
+						@Override
+						public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
+							if (newState == State.SUCCEEDED) {
+								JSObject htmlWindow = (JSObject) pickerView.getEngine().executeScript("window");
+								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteController.this));
+								htmlWindow.call("loadResources", (Object)resourceManager.getResources());
+							}
+						}
+					});
+
+		}
+		pickerView.getEngine().load(getClass().getResource("EmoticonView.html").toExternalForm());
+		pickerStage.show();
+	}
+
 	@FXML
 	void doPasteImage(ActionEvent event) {
 		Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -181,7 +229,7 @@ public class ChatteController implements Initializable {
 		WebEngine engine = webView.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("clearScreen");
-		stage.setIconified(true);
+		mainWindow.setIconified(true);
 		inputArea.requestFocus();
 	}
 	
@@ -190,7 +238,7 @@ public class ChatteController implements Initializable {
 		doSendMessage();
 		inputArea.requestFocus();
 	}
-
+	
 	public void appendInputImage(String resourceCode) {
 		WebEngine engine = inputArea.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
@@ -205,15 +253,15 @@ public class ChatteController implements Initializable {
 		WebEngine engine = webView.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("displayMessage", message);
-		stage.toFront();
+		mainWindow.toFront();
 	}
 
-	public Stage getStage() {
-		return stage;
+	public Stage getMainWindow() {
+		return mainWindow;
 	}
 
-	public void setStage(Stage stage) {
-		this.stage = stage;
+	public void setMainWindow(Stage mainWindow) {
+		this.mainWindow = mainWindow;
 	}
 
 }

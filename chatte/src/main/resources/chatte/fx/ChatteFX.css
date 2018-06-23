@@ -38,8 +38,7 @@
 .dialog-buttons {
 	-fx-text-alignment: center;
     -fx-font-size: 14pt;
-    -fx-min-width: 300px;
-    -fx-pref-width: 300px;
+    -fx-pref-width: 100px;
     -fx-padding: 5 10 3 10;
 }
 

@@ -25,26 +25,9 @@ SOFTWARE.
 <html>
 <head>
 <meta charset="utf-8" />
-<title>ChatteFX</title>
+<title>ChatteFX - Conversation</title>
 <link rel="stylesheet" href="ChatView.css" />
-<script type="text/javascript">
-function displayMessage(msg) {
-	var msglist, msgEl;
-	if(!msg) return;
-	msglist = document.getElementById('msglist');
-	msgEl = document.createElement('DIV');
-	msgEl.innerHTML = msg.getMessage();
-	msglist.appendChild(msgEl);
-}
-function clearScreen() {
-	// faster than msglist.innerHTML=''
-	// https://jsperf.com/innerhtml-vs-removechild/15
-	var msglist = document.getElementById('msglist');
-	while (msglist.firstChild) {
-		msglist.removeChild(msglist.firstChild);
-	}
-}
-</script>
+<script type="text/javascript" src="ChatView.js"></script>
 </head>
 <body>
 <h1>Welcome Grande Chato</h1>

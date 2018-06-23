@@ -23,10 +23,14 @@ public class ChatteDialog extends Stage {
 	private int selected;
 
 	public ChatteDialog(Stage parent, String title, String message, String [] buttons) {
-		setupUI(parent, title, message, buttons);
+		setupUI(parent, title, message, buttons, 0);
 	}
 	
-	void setupUI(Stage parent, String title, String message, String [] buttons) {
+	public ChatteDialog(Stage parent, String title, String message, String [] buttons, int cancelIndex) {
+		setupUI(parent, title, message, buttons, cancelIndex);
+	}
+	
+	void setupUI(Stage parent, String title, String message, String [] buttons, int cancelIndex) {
 		// TODO use stylesheet??
 	    HBox buttonsPanel = new HBox();
 	    buttonsPanel.setAlignment( Pos.CENTER_RIGHT );
@@ -34,8 +38,10 @@ public class ChatteDialog extends Stage {
 	    
 	    for(int i = 0; i < buttons.length; i++) {
 		    Button button = new Button( buttons[i] );
+		    button.setCancelButton(i==cancelIndex);
 		    button.setOnAction(new ButtonAction(i));
 		    button.getStyleClass().add("dialog-buttons");
+		    button.setPrefWidth(100.0);
 		    buttonsPanel.getChildren().add(button);
 	    }
 	    

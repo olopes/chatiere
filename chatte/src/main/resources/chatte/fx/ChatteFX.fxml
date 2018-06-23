@@ -46,7 +46,7 @@ SOFTWARE.
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.edit">
 					<items>
-						<MenuItem mnemonicParsing="false" text="%menuitem.paste" />
+						<MenuItem mnemonicParsing="false" text="%menuitem.paste" onAction="#doPasteImage" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.help">
@@ -71,12 +71,12 @@ SOFTWARE.
 							<top>
 								<ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 									<items>
-										<Button fx:id="preferencesBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.prefs">
+										<Button fx:id="preferencesBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.prefs" onAction="#doOpenPreferences">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.prefs" />
 											</tooltip>
 										</Button>
-										<Button fx:id="emoticonBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.emoticon">
+										<Button fx:id="emoticonBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.emoticon" onAction="#doOpenEmoticonPanel">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.emoticon" />
 											</tooltip>
@@ -103,7 +103,7 @@ SOFTWARE.
 											</tooltip>
 										</Button>
 										<Region fx:id="rightSpring" />
-										<Button fx:id="sendBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.send">
+										<Button fx:id="sendBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.send" onAction="#doSend">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.send" />
 											</tooltip>
