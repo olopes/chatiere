@@ -28,7 +28,7 @@ function displayMessage(msg) {
 	if(!msg) return;
 	msglist = document.getElementById('msglist');
 	msgEl = document.createElement('DIV');
-	msgEl.innerHTML = msg.getMessage();
+	msgEl.innerHTML = msg;
 	msglist.appendChild(msgEl);
 	window.scrollTo(0,document.body.scrollHeight);
 }

@@ -70,11 +70,10 @@ hr {
 
 .timestamp {
 	color: #999999;
-	text-align: right;
+	float: right;
 }
 
-.from0 {
-	color: #a500ff;
+.from {
 	font-weight: bold;
 	border-top: 1px solid #888888;
 }
