@@ -61,7 +61,7 @@ SOFTWARE.
 	<center>
 		<SplitPane dividerPositions="0.2" prefHeight="200.0" prefWidth="200.0">
 			<items>
-				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" />
+				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list"/>
 				<SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="472.0" prefWidth="474.0">
 					<items>
 						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />

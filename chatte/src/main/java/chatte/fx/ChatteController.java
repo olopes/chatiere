@@ -104,7 +104,6 @@ public class ChatteController implements Initializable {
 	
 	private String lastStyle="odd";
 	private Friend lastUser=null;
-	private Date lastReceived = new Date();
 
 	private Logger log = getLogger();
 	Logger getLogger() {
@@ -334,32 +333,29 @@ public class ChatteController implements Initializable {
 		System.out.println(msg.getMessage());
 		
 		Date received = new Date();
-		boolean newUser = false, newDate = false;
+		boolean newUser = false;
 		if(lastUser != msg.getFrom()) {
 			newUser = true;
 			lastUser = msg.getFrom();
 			lastStyle = "even".equals(lastStyle)?"odd":"even";
 		}
 		
-		if(newUser || received.getTime()-lastReceived.getTime() > 60000L /*300000L*/) {
-			lastReceived= received;
-			newDate = true;
-		}
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class=\"").append(lastStyle).append("\">");
-		if(newUser || newDate) {
+		if(newUser) {
 			int idx = listView.getItems().indexOf(msg.getFrom())%10;
 			String friendClass = "friend"+idx;
-			SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss");
 			sb.append("<div class=\"from ").append(friendClass).append("\">")
-			.append("<span class=\"timestamp\">").append(fmt.format(new Date())).append("</span> ")
 			.append(msg.getFrom().getNick())
 			.append("</div>");
 		}
 
+		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss");
 		sb
-		.append("<div class=\"message\">").append(msg.getMessage()).append("</div>")
+		.append("<div class=\"message\">").append(msg.getMessage()).append(' ')
+		.append("<span class=\"timestamp\">").append(fmt.format(received)).append("</span> ")
+		
+		.append("</div>")
 		.append("</div>");
 		// sb.append("<div><img src=\"").append(new File("img/hello.gif").toURI().toURL()).append("\" /></div>");
 		// System.out.println(sb);
