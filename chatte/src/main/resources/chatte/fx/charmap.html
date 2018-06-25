@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta charset="utf-8" />
+<title>ChatteFX</title>
+<style>
+    /* definition */
+    @font-face {
+    font-family: OpenSansEmoji;
+        src: url('OpenSansEmoji.ttf');
+        font-weight: normal;
+        font-style: normal;
+    }
+</style>
+<link rel="stylesheet" href="ChatView.css" />
+<script type="text/javascript">
+function genRow(baseChar) {
+    var row = document.createElement('TR');
+    var cell = document.createElement('TD');
+    cell.textContent=baseChar.toString(16);
+    row.appendChild(cell);
+    for(var i = 0; i < 16; i++) {
+        cell = document.createElement('TD');
+        cell.textContent =  String.fromCodePoint(baseChar+i); // '&amp;#'+baseChar+(i.toString(16))+';';
+        row.appendChild(cell);
+    }
+    return row;
+}
+function genTable(from) {
+    
+    var body = document.getElementById("contents").tBodies[0];
+    
+    while (body.firstChild) {
+        body.removeChild(body.firstChild);
+    }
+    var to = from+256;
+    for(var i = from; i < to; i++) {
+        var row = genRow(i*16);
+        body.appendChild(row);
+    }
+
+}
+var cnt = 0x1f00;
+
+function nextClick() {
+    cnt += 0x100;
+    genTable(cnt);
+}
+
+function prevClick() {
+    cnt -= 0x100;
+    if(cnt < 0) cnt = 0;
+    genTable(cnt);
+}
+
+</script>
+  </head>
+  <body>
+  <h1>Charmap</h1>
+  <div>
+  <button onclick="prevClick();return false;">&lt;&lt;</button>
+  <button onclick="nextClick();return false;">&gt;&gt;</button>
+  <table id="contents" border="1">
+  <thead>
+  <tr>
+  <th>&nbsp;</th>
+  <th>0</th>
+  <th>1</th>
+  <th>2</th>
+  <th>3</th>
+  <th>4</th>
+  <th>5</th>
+  <th>6</th>
+  <th>7</th>
+  <th>8</th>
+  <th>9</th>
+  <th>A</th>
+  <th>B</th>
+  <th>C</th>
+  <th>D</th>
+  <th>E</th>
+  <th>F</th>
+  </tr>
+  </thead>
+  <tbody>
+  </tbody>
+  </table>
+  </body>
+<script type="text/javascript">
+// genTable(cnt);
+document.write(String.fromCodePoint(0x1f472, 0x1f989, 0x1f1f5, 0x1f1f9, 0x1F46F));
+</script>  
+</html>
