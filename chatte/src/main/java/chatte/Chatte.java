@@ -24,12 +24,69 @@
  */
 package chatte;
 
-import chatte.fx.ChatteFX;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
 public class Chatte {
+	
+	static boolean hasJfxrt(URLClassLoader cl) {
+		for(URL entry : cl.getURLs()) {
+			File f = new File(entry.getFile());
+			System.out.println("   => "+f.getName());
+			if(f.exists() && f.isFile() && "jfxrt.jar".equals(f.getName())) {
+				System.out.println("Found it!! Nothing to be done.");
+				return true;
+			}
+		}
+		return false;
+	}
 
-	public static void main(String[] args) {
-		ChatteFX.main(args);
+	public static void main(String[] args) throws Exception {
+		/*
+		 * This is why we can't have nice things.
+		 */
+		ClassLoader cl = Chatte.class.getClassLoader();
+		if(cl instanceof URLClassLoader) {
+			System.out.println("Launcher is URLClassLoader!");
+			URL [] oldClassPath = ((URLClassLoader)cl).getURLs();
+			System.out.println(Arrays.asList(oldClassPath));
+			
+			// check if jfxrt.jar is already in the classpath
+			boolean jfxrtFound = hasJfxrt((URLClassLoader)cl);
+			if(!jfxrtFound) {
+				// java8 will add jfxrt.jar to ext classpath
+				System.out.println("Checking ext classpath...");
+				jfxrtFound = hasJfxrt((URLClassLoader)cl.getParent());
+			}
+			
+			if(!jfxrtFound) {
+				System.out.println("jfxrt.jar not in classpath. hacking... :-(");
+				// find jfxrt location
+				String javaHomePath = System.getProperty("java.home");
+				File javaHome = new File(javaHomePath);
+				File jfxrt = new File(new File(javaHome, "lib"), "jfxrt.jar");
+				System.out.println("jfxrt.jar location: "+jfxrt);
+
+				Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+				addURL.setAccessible(true);
+				addURL.invoke(cl, jfxrt.toURI().toURL());
+				URL [] newClassPath = ((URLClassLoader)cl).getURLs();
+				System.out.println("Fixed classpath:");
+				System.out.println(Arrays.asList(newClassPath));
+
+				cl.loadClass("javafx.application.Application");
+			}
+		}
+		
+		System.out.println("Loading ChatteFX class");
+		Class<?> cc = cl.loadClass("chatte.fx.ChatteFX");
+		Method main = cc.getDeclaredMethod("main", String[].class);
+		System.out.println("Starting ChatteFX");
+		main.invoke(null, (Object)args);
+
 	}
 
 }
