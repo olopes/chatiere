@@ -24,6 +24,9 @@
  */
 package chatte.fx;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -47,7 +50,6 @@ import chatte.resources.ResourceManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -57,9 +59,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.image.Image;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -284,20 +283,35 @@ public class ChatteController implements Initializable {
 	
 	@FXML
 	void doPasteImage(ActionEvent event) {
-		Clipboard clipboard = Clipboard.getSystemClipboard();
-		if(clipboard.hasContent(DataFormat.IMAGE)) {
-			try {
-				Image image = clipboard.getImage();
-				java.awt.image.BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
-				File tempFile = File.createTempFile("tmp_", ".png");
-				ImageIO.write(bufferedImage, "png", tempFile);
-				String resource = resourceManager.addResource(tempFile);
-				tempFile.delete();
+		// mixing awt/swing/javafx... why? Why? WHY?
+        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+        	try {
+        		java.awt.Image awtImage = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
+    			java.awt.image.BufferedImage bufferedImage = null;
+        		if(awtImage instanceof java.awt.image.BufferedImage) {
+        			bufferedImage = (java.awt.image.BufferedImage) awtImage;
+        		} else {
+        			int w = awtImage.getWidth(null);
+        			int h = awtImage.getHeight(null);
+        			int type = java.awt.image.BufferedImage.TYPE_INT_RGB;  // other options
+        			bufferedImage = new java.awt.image.BufferedImage(w, h, type);
+        			java.awt.Graphics2D g2 = bufferedImage.createGraphics();
+        			g2.drawImage(awtImage, 0, 0, null);
+        			g2.dispose();
+        		}
+        		
+        		bufferedImage.flush();
+        		File tempFile = File.createTempFile("tmp_", ".png");
+        		ImageIO.write(bufferedImage, "png", tempFile);
+        		String resource = resourceManager.addResource(tempFile);
+        		tempFile.delete();
 
-				appendInputImage(resource);
-			} catch(Exception e) {
-				log.log(Level.SEVERE, "Error copying image from clipboard", e);
-			}
+        		appendInputImage(resource);
+
+        	} catch(Exception e) {
+        		log.log(Level.SEVERE, "Error copying image from clipboard", e);
+        	}
 		}
 		inputArea.requestFocus();
 	}

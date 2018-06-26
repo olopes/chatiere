@@ -71,6 +71,7 @@ hr {
 .timestamp {
 	color: #999999;
 	float: right;
+	clear: both;
 }
 
 .from {
