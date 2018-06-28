@@ -22,6 +22,16 @@
  * SOFTWARE.
  * 
  */
+function getInputContents() {
+	var result = {}, resources = [], images, i;
+	images = document.body.getElementsByTagName("IMG");
+	for (i = 0; i < images.length; i++) {
+		resources.push(images[i].src.substring(6));
+	}	
+	result.resources = resources;
+	result.text = document.body.innerHTML;
+	return result;
+}
 
 function displayMessage(msg) {
 	var msglist, msgEl;

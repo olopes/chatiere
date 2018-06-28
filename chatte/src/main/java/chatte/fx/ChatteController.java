@@ -31,13 +31,17 @@ import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
 import chatte.config.ConfigService;
+import chatte.history.HistoryLogger;
+import chatte.history.HistoryLoggerImpl;
 import chatte.msg.ChatMessage;
 import chatte.msg.ConnectedMessage;
 import chatte.msg.DisconnectedMessage;
@@ -100,6 +104,7 @@ public class ChatteController implements Initializable {
 	Friend me;
 	MessageBroker messageBroker;
 	ResourceManager resourceManager;
+	HistoryLogger history;
 	
 	private String lastStyle="odd";
 	private Friend lastUser=null;
@@ -112,7 +117,8 @@ public class ChatteController implements Initializable {
 	public ChatteController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
 		this.messageBroker=messageBroker;
 		this.resourceManager = resourceManager;
-		me = configService.getSelf();
+		this.history = new HistoryLoggerImpl(messageBroker, configService, resourceManager);
+		this.me = configService.getSelf();
 		this.messageBroker.addListener(this);
 	}
 
@@ -191,11 +197,19 @@ public class ChatteController implements Initializable {
 
 	void doSendMessage() {
 		WebEngine engine = inputArea.getEngine();
-		String txtData = (String) engine.executeScript("document.body.innerHTML");
-		// HTMLElement body = (HTMLElement) engine.getDocument().getElementsByTagName("body").item(0);
+		JSObject inputContents = (JSObject) engine.executeScript("getInputContents()");
+		String txtData = (String) inputContents.getMember("text");
 		log.fine(txtData);
+		
+		Set<String> resources = new HashSet<>();
+		JSObject resourcesObject = (JSObject) inputContents.getMember("resources");
+		int size = ((Number)resourcesObject.getMember("length")).intValue();
+		for(int i = 0; i < size; i++) {
+			resources.add((String)resourcesObject.getSlot(i));
+		}
+		log.fine("Resources: "+resources);
 		engine.executeScript("document.body.innerHTML=''");
-		this.messageBroker.sendMessage(new TypedMessage(me, txtData, null));
+		this.messageBroker.sendMessage(new TypedMessage(me, txtData, resources));
 	}
 	
 	// input
@@ -384,11 +398,27 @@ public class ChatteController implements Initializable {
 		
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("displayMessage", htmlMessage);
+		history.recordMessage(htmlMessage, message.getResourceRefs());
 		mainWindow.toFront();
 	}
 	
-	public void displayStatusMessage(StatusMessage message) {
-		log.info("Status message received: "+message);
+	public void displayStatusMessage(StatusMessage msg) {
+		log.info("Status message received: "+msg);
+		WebEngine engine = webView.getEngine();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("<div class=\"").append(msg.getStatus()).append("\">");
+		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss");
+		sb.append("<span class=\"timestamp\">").append(fmt.format(new Date())).append("</span> ")
+		.append(msg.getFrom())
+		.append(" &lt;").append(msg.getStatus()).append("&gt;</div>");
+
+		String htmlMessage = sb.toString();
+		
+		JSObject htmlWindow = (JSObject) engine.executeScript("window");
+		htmlWindow.call("displayMessage", htmlMessage);
+		history.recordMessage(htmlMessage, null);
+		mainWindow.toFront();
 	}
 
 	public void welcomeFriend(final WelcomeMessage message) {
