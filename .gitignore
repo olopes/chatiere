@@ -31,5 +31,6 @@ hs_err_pid*
 # project stuff
 logs/
 toybox/
+chatlog/
 ssl.key
 config.xml
