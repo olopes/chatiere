@@ -28,6 +28,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -105,6 +106,7 @@ public class ChatteController implements Initializable {
 	MessageBroker messageBroker;
 	ResourceManager resourceManager;
 	HistoryLogger history;
+	SoEnv soEnv;
 	
 	private String lastStyle="odd";
 	private Friend lastUser=null;
@@ -120,6 +122,7 @@ public class ChatteController implements Initializable {
 		this.history = new HistoryLoggerImpl(messageBroker, configService, resourceManager);
 		this.me = configService.getSelf();
 		this.messageBroker.addListener(this);
+		soEnv = SoEnv.getEnv();
 	}
 
 	public Stage getMainWindow() {
@@ -328,6 +331,27 @@ public class ChatteController implements Initializable {
         	}
 		}
 		inputArea.requestFocus();
+	}
+	
+	@FXML
+	void doOpenSnipingTool(ActionEvent event) {
+		// kde -> spectacle
+		// gnome -> gnome-screenshot -i
+		// windows -> %windir%\system32\SnippingTool.exe
+		
+		String [] cmdline = soEnv.getCmd();
+		if(cmdline.length == 0) return ; // nothing to run
+		final ProcessBuilder processBuilder = new ProcessBuilder(cmdline).inheritIO();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					processBuilder.start();
+				} catch (IOException e) {
+	        		log.log(Level.SEVERE, "Error launching snipping tool", e);
+				}
+			}
+		}).start();
 	}
 	
 	@FXML

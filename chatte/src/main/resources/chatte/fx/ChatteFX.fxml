@@ -92,7 +92,7 @@ SOFTWARE.
 												<Tooltip text="%tooltip.btn.paste" />
 											</tooltip>
 										</Button>
-										<Button fx:id="snipBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.snip">
+										<Button fx:id="snipBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.snip" onAction="#doOpenSnipingTool">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.snip" />
 											</tooltip>
