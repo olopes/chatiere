@@ -1,11 +1,13 @@
 package chatte.fx;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
+import javafx.fxml.FXML;
 import javafx.util.Callback;
 
 public class ControllerFactory implements Callback<Class<?>, Object> {
@@ -35,6 +37,24 @@ public class ControllerFactory implements Callback<Class<?>, Object> {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
+		// Try to inject factory class
+		Class<?> factoryClass = getClass();
+		Field [] fields = clazz.getDeclaredFields();
+		for(Field fld : fields) {
+			FXML fxml = fld.getAnnotation(FXML.class);
+			if(fxml != null && fld.getType().isAssignableFrom(factoryClass)) {
+				try {
+					fld.setAccessible(true);
+					fld.set(instance, this);
+					break;
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		return instance;
 	}
 

@@ -41,5 +41,7 @@ public interface ConfigService {
 	Friend getFriend(String addr);
 
 	void addFriend(Friend friend);
+
+	void removeFriend(Friend friend);
 	
 }

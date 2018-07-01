@@ -26,15 +26,24 @@ package chatte.msg;
 
 import java.io.Serializable;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+
 public class Friend implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	String nick;
 	String host;
 	int port;
-	transient boolean connected;
+	
+	transient ReadOnlyBooleanWrapper connectedProperty;
+	transient ReadOnlyStringWrapper nickProperty;
 
 	public Friend() {
+		connectedProperty = new ReadOnlyBooleanWrapper(false);
+		nickProperty = new ReadOnlyStringWrapper();
 	}
 	
 	public String getNick() {
@@ -43,6 +52,7 @@ public class Friend implements Serializable {
 
 	public void setNick(String nick) {
 		this.nick = nick;
+		this.nickProperty.set(nick);
 	}
 
 	public String getHost() {
@@ -62,11 +72,19 @@ public class Friend implements Serializable {
 	}
 
 	public boolean isConnected() {
-		return connected;
+		return connectedProperty.get();
 	}
 
 	public void setConnected(boolean connected) {
-		this.connected = connected;
+		this.connectedProperty.set(connected);
+	}
+	
+	public ReadOnlyBooleanProperty connectedProperty() {
+		return connectedProperty.getReadOnlyProperty();
+	}
+	
+	public ReadOnlyStringProperty nickProperty() {
+		return nickProperty.getReadOnlyProperty();
 	}
 	
 	@Override

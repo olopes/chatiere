@@ -31,6 +31,9 @@ SOFTWARE.
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import java.net.*?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.TabPane?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.fx.ChatteController">
 <stylesheets>
@@ -47,7 +50,7 @@ SOFTWARE.
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.edit">
 					<items>
-						<MenuItem mnemonicParsing="false" text="%menuitem.paste" onAction="#doPasteImage" />
+						<MenuItem mnemonicParsing="false" onAction="#doPasteImage" text="%menuitem.paste" />
 					</items>
 				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.help">
@@ -61,7 +64,20 @@ SOFTWARE.
 	<center>
 		<SplitPane dividerPositions="0.2" prefHeight="200.0" prefWidth="200.0">
 			<items>
-				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list"/>
+			<TabPane side="BOTTOM">
+			<tabs>
+      				<Tab closable="false" text="Friends">
+	      				<content>
+							<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list" />
+	      				</content>
+      				</Tab>
+      				<Tab closable="false" text="New friend">
+	      				<content>
+		      				<fx:include fx:id="contactPanel" source="Contacts.fxml" />
+	      				</content>
+      				</Tab>
+               </tabs>
+            </TabPane>
 				<SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="472.0" prefWidth="474.0">
 					<items>
 						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />
@@ -72,39 +88,39 @@ SOFTWARE.
 							<top>
 								<ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 									<items>
-										<Button fx:id="preferencesBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.prefs" onAction="#doOpenPreferences">
+										<Button fx:id="preferencesBtn" mnemonicParsing="false" onAction="#doOpenPreferences" styleClass="toolbar-buttons" text="%btn.prefs">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.prefs" />
 											</tooltip>
 										</Button>
-										<Button fx:id="emoticonBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.emoticon" onAction="#doOpenEmoticonPanel">
+										<Button fx:id="emoticonBtn" mnemonicParsing="false" onAction="#doOpenEmoticonPanel" styleClass="toolbar-buttons" text="%btn.emoticon">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.emoticon" />
 											</tooltip>
 										</Button>
-										<Button fx:id="addImgBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.addimg" onAction="#doAddImage">
+										<Button fx:id="addImgBtn" mnemonicParsing="false" onAction="#doAddImage" styleClass="toolbar-buttons" text="%btn.addimg">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.addimg" />
 											</tooltip>
 										</Button>
-										<Button fx:id="pasteBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.paste" onAction="#doPasteImage">
+										<Button fx:id="pasteBtn" mnemonicParsing="false" onAction="#doPasteImage" styleClass="toolbar-buttons" text="%btn.paste">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.paste" />
 											</tooltip>
 										</Button>
-										<Button fx:id="snipBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.snip" onAction="#doOpenSnipingTool">
+										<Button fx:id="snipBtn" mnemonicParsing="false" onAction="#doOpenSnipingTool" styleClass="toolbar-buttons" text="%btn.snip">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.snip" />
 											</tooltip>
 										</Button>
 										<Region fx:id="leftSpring" />
-										<Button fx:id="clsBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.cls" onAction="#doPanic">
+										<Button fx:id="clsBtn" mnemonicParsing="false" onAction="#doPanic" styleClass="toolbar-buttons" text="%btn.cls">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.cls" />
 											</tooltip>
 										</Button>
 										<Region fx:id="rightSpring" />
-										<Button fx:id="sendBtn" mnemonicParsing="false" styleClass="toolbar-buttons" text="%btn.send" onAction="#doSend">
+										<Button fx:id="sendBtn" mnemonicParsing="false" onAction="#doSend" styleClass="toolbar-buttons" text="%btn.send">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.send" />
 											</tooltip>

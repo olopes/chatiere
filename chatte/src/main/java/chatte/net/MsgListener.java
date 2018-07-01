@@ -26,9 +26,11 @@ package chatte.net;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -50,6 +52,7 @@ import chatte.msg.MessageBroker;
 import chatte.msg.MessageListener;
 import chatte.msg.MySelf;
 import chatte.msg.NewFriendMessage;
+import chatte.msg.StopServicesMessage;
 import chatte.msg.WelcomeMessage;
 
 public class MsgListener implements Runnable {
@@ -60,7 +63,8 @@ public class MsgListener implements Runnable {
 	Set<Friend> connectedFriends;
 	Deque<Friend> connectingFriends;
 	Set<String> localAddresses;
-	Thread connectorThread;
+	volatile ServerSocket serverSocket;
+	Thread connectorThread, listenerThread;
 	private Logger log = getLogger();
 	Logger getLogger() {
 		return Logger.getLogger(getClass().getName());
@@ -90,13 +94,26 @@ public class MsgListener implements Runnable {
 		loadLocalAddresses();
 		this.connectorThread = new Thread(new FriendConnector(), "Friend Connector");
 		this.connectorThread.start();
+		this.listenerThread = new Thread(this, "Connection Listener");
+		this.listenerThread.start();
 	}
 	
 	public void sendStop() {
 		running = false;
-		connectorThread.interrupt();
+		try {
+			connectorThread.interrupt();
+		} catch (Throwable e) {
+		}
+		try {
+			listenerThread.interrupt();
+		} catch (Throwable e) {
+		}
+		try {
+			serverSocket.close();
+		} catch (Throwable e) {
+		}
 	}
-	
+
 	void loadLocalAddresses () {
 		try {
 			Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
@@ -131,6 +148,7 @@ public class MsgListener implements Runnable {
 		// listen for connections
 		ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
 		try (ServerSocket server = factory.createServerSocket(getPort())) {
+			this.serverSocket = server;
 			while(running) {
 				try {
 					Socket socket = server.accept();
@@ -143,6 +161,9 @@ public class MsgListener implements Runnable {
 					
 					MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 					new Thread(newWorker,"net client "+host).start();
+				} catch(SocketTimeoutException ex) {
+					log.finest("socket timeout");
+					System.out.println(".");
 				} catch(IOException ex) {
 					log.log(Level.SEVERE, "Connection error", ex);
 				}
@@ -157,6 +178,12 @@ public class MsgListener implements Runnable {
 	
 	public List<Friend> getConnectedFriends() {
 		return configService.getKnownFriends();// connectedFriends;
+	}
+	
+	@MessageListener
+	public void shutdown(StopServicesMessage message) {
+		log.fine("Stop service request");
+		sendStop();
 	}
 	
 	@MessageListener
@@ -214,7 +241,9 @@ public class MsgListener implements Runnable {
 		
 		connectedFriends.add(friend);
 		try {
-			Socket socket = SSLSocketFactory.getDefault().createSocket(friend.getHost(), friend.getPort());
+			
+			Socket socket = SSLSocketFactory.getDefault().createSocket();
+			socket.connect(InetSocketAddress.createUnresolved(friend.getHost(), friend.getPort()), 10000);
 			MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 			Thread workerThread = new Thread(newWorker,"net client "+socket.getInetAddress());
 			workerThread.start();

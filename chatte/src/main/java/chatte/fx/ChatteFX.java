@@ -24,9 +24,12 @@
  */
 package chatte.fx;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -40,13 +43,23 @@ import chatte.resources.ChatoResourceManager;
 import chatte.resources.ResourceManager;
 import chatte.resources.ResourceRequestHandler;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
 public class ChatteFX extends Application {
@@ -56,19 +69,14 @@ public class ChatteFX extends Application {
 		return Logger.getLogger(getClass().getName());
 	}
 
-
+	boolean passwordSet = false;
 	MessageBroker messageBroker;
 	ResourceManager resourceManager;
 	ConfigService configService;
-	ResourceBundle resources;
+	ResourceBundle resourceBundle;
 	ControllerFactory controllerFactory;
 	
 	public static void main(String [] args) {
-		// Configure SSL context
-		System.setProperty("javax.net.ssl.keyStore","ssl.key");
-		System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.trustStore","ssl.key");
-		System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
 		
 		// Configure logging
 		if(!System.getProperties().containsKey("java.util.logging.config.file")) {
@@ -94,7 +102,7 @@ public class ChatteFX extends Application {
 
 		// Application.Parameters parameters = getParameters();
 
-		resources = ResourceBundle.getBundle("chatte.fx.Bundle"); 
+		resourceBundle = ResourceBundle.getBundle("chatte.fx.Bundle"); 
 
 		configService = new ConfigServiceImpl();
 		resourceManager = new ChatoResourceManager();
@@ -114,9 +122,37 @@ public class ChatteFX extends Application {
 		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12);
 	}
 
+    private boolean setStorePassword(final String password) {
+    	passwordSet = isGoodPassword("ssl.key", password);
+		// Configure SSL context
+		System.setProperty("javax.net.ssl.keyStore","ssl.key");
+		// System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
+		System.setProperty("javax.net.ssl.keyStorePassword",password);
+		System.setProperty("javax.net.ssl.trustStore","ssl.key");
+		// System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
+		System.setProperty("javax.net.ssl.trustStorePassword",password);
+        log.info("Key configured!");
+        return passwordSet;
+    }
+
+	
+	private boolean isGoodPassword(String storeFile, String password) {
+		try (FileInputStream in = new FileInputStream(storeFile)){
+			KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+			store.load(in, password.toCharArray());
+			log.info("KeyStore successfuly loaded");
+			return true;
+		} catch(Exception e) {
+			log.info("Bad password");
+		}
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resources);
+		
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resourceBundle);
 		loader.setControllerFactory(controllerFactory);
 		Parent root = (Parent)loader.load();
 		ChatteController controller = loader.getController();
@@ -134,11 +170,11 @@ public class ChatteFX extends Application {
 				log.fine("Window close request");
 				ChatteDialog dialog = new ChatteDialog(
 						primaryStage,
-						resources.getString("dialog.close.title"),
-						resources.getString("dialog.close.message"),
+						resourceBundle.getString("dialog.close.title"),
+						resourceBundle.getString("dialog.close.message"),
 						new String [] {
-								resources.getString("dialog.close.cancel"),
-								resources.getString("dialog.close.exit"),
+								resourceBundle.getString("dialog.close.cancel"),
+								resourceBundle.getString("dialog.close.exit"),
 						}
 						);
 				int selected = dialog.showDialog();
@@ -152,6 +188,19 @@ public class ChatteFX extends Application {
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon/cat-upsidedown-icon.png")));
 		primaryStage.setScene(scene);
 		primaryStage.show();
+
+		// Ask for keystore password. It won't connect to the network is the password is wrong
+		Stage passwordStage = new Stage(StageStyle.UTILITY);
+		passwordStage.initOwner(primaryStage);
+		passwordStage.initModality(Modality.WINDOW_MODAL);
+		createLoginScene(passwordStage);
+		passwordStage.showAndWait();
+		if(!passwordSet) {
+			// remove event handler
+			primaryStage.setOnCloseRequest(null);
+			primaryStage.hide();
+			return;
+		}
 	}
 
 	@Override
@@ -160,5 +209,51 @@ public class ChatteFX extends Application {
 		messageBroker.sendMessage(new StopServicesMessage());
 		super.stop();
 	}
+	
+    private Scene createLoginScene(final Stage stage) {
+        VBox vbox = new VBox(3);
+        vbox.setPadding(new Insets(10.0));
+ 
+        final Label loginLabel = new Label();
+        loginLabel.setText("name");
+        
+        final PasswordField passwordBox = new PasswordField();
+        passwordBox.setPromptText("password");
+        
+        final Button button = new Button("Log in");
+        button.setDefaultButton(true);
+        button.setOnAction(new EventHandler<ActionEvent>(){
+            public void handle(ActionEvent t) {
+                // Save credentials
+                String password = passwordBox.getText();
+                // Do not allow any further edits
+                passwordBox.setEditable(false);
+                button.setDisable(true);
+                
+                if(setStorePassword(password)) {
+                	new chatte.net.MsgListener(messageBroker, configService);
+                	log.info("Good password :-)");
+                    // Hide if app is ready
+                    stage.close();
+                } else {
+                	log.log(Level.SEVERE, "BAD PASSWORD!");
+                	// enable edits and show 
+                    passwordBox.setEditable(true);
+                    button.setDisable(false);
+                }
+                
+            }
+        });
+        HBox buttonHolder = new HBox();
+        buttonHolder.setAlignment(Pos.TOP_CENTER);
+        buttonHolder.getChildren().add(button);
+        vbox.getChildren().addAll(loginLabel, passwordBox, buttonHolder);
+        
+        Scene sc = new Scene(vbox);//, 200, 200);
+        stage.setScene(sc);
+        return sc;
+    }
+    
+
 
 }

@@ -117,7 +117,7 @@ public class ConfigServiceImpl implements ConfigService {
 	public Friend getFriend(String addr) {
 		// resolve??
 		String host = fixHost(addr);
-		Friend ff = knownFriends.get(fixHost(addr));
+		Friend ff = knownFriends.get(host);
 		if(null == ff) {
 			ff = new Friend();
 			ff.setHost(host);
@@ -157,5 +157,12 @@ public class ConfigServiceImpl implements ConfigService {
 			return null;
 		}
 
+	}
+
+	@Override
+	public void removeFriend(Friend friend) {
+		// fetch true reference to friend
+		String realHost = fixHost(friend.getHost());
+		knownFriends.remove(realHost);
 	}
 }

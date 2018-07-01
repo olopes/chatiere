@@ -31,8 +31,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
@@ -57,25 +59,28 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import netscape.javascript.JSObject;
 
 public class ChatteController implements Initializable {
@@ -85,6 +90,12 @@ public class ChatteController implements Initializable {
 	@FXML ListView<Friend> listView;
 	@FXML WebView webView;
 	@FXML WebView inputArea;
+
+	// Contact list buttons
+	@FXML Region leftContactSpring;
+	@FXML Button addContact;
+	@FXML Button removeContact;
+	@FXML Region rightContactSpring;
 
 	// toolbar buttons
 	@FXML Button preferencesBtn;
@@ -97,6 +108,18 @@ public class ChatteController implements Initializable {
 	@FXML Button sendBtn;
 	@FXML Button snipBtn;
 	
+	// Controller factory used to create this controller
+	@FXML ControllerFactory controllerFactory;
+
+	// windows, dialogs and stuff
+	Stage preferencesWindow;
+	PreferencesController preferencesController;
+	@FXML VBox contactPanel;
+	@FXML ContactsController contactPanelController;
+	NotifPopup notifPopup;
+	PreferencesController notifPopupController;
+
+	
 	// class specific stuff
 	Stage mainWindow;
 	Stage pickerStage;
@@ -106,6 +129,7 @@ public class ChatteController implements Initializable {
 	MessageBroker messageBroker;
 	ResourceManager resourceManager;
 	HistoryLogger history;
+	ConfigService configService;
 	SoEnv soEnv;
 	
 	private String lastStyle="odd";
@@ -120,6 +144,7 @@ public class ChatteController implements Initializable {
 		this.messageBroker=messageBroker;
 		this.resourceManager = resourceManager;
 		this.history = new HistoryLoggerImpl(messageBroker, configService, resourceManager);
+		this.configService=configService;
 		this.me = configService.getSelf();
 		this.messageBroker.addListener(this);
 		soEnv = SoEnv.getEnv();
@@ -133,18 +158,6 @@ public class ChatteController implements Initializable {
 		this.mainWindow = mainWindow;
 	}
 	
-	private static class FriendStringConverter extends StringConverter<Friend> {
-		@Override
-		public Friend fromString(String string) {
-			return null;
-		}
-		
-		@Override
-		public String toString(Friend object) {
-			return object.getNick();
-		}
-	}
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		this.bundle = resources;
@@ -157,28 +170,26 @@ public class ChatteController implements Initializable {
         listView.setCellFactory(new Callback<ListView<Friend>, ListCell<Friend>>() {
         	@Override
         	public ListCell<Friend> call(ListView<Friend> param) {
-        		final TextFieldListCell<Friend> cell = new TextFieldListCell<>(new FriendStringConverter());
-        		cell.indexProperty().addListener(new ChangeListener<Number>() {
-					@Override
-					public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-						if(oldValue != null) { 
-							int oldIdx = oldValue.intValue()%10;
-							cell.getStyleClass().remove("friend"+oldIdx);
-						}
-						int newIdx = newValue.intValue()%10;
-						cell.getStyleClass().add("friend"+newIdx);
-					}
-				});
-        		cell.itemProperty().addListener(new ChangeListener<Friend>() {
-					@Override
-					public void changed(ObservableValue<? extends Friend> observable, Friend oldValue, Friend newValue) {
-						if(newValue == null)
-							cell.getTooltip().setText("");
-						else
-							cell.getTooltip().setText(newValue.getNick()+"@"+newValue.getHost());
-					}
-				});
-        		cell.setTooltip(new Tooltip(""));
+        		ListCell<Friend> cell = new ListCell<Friend>() {
+        			protected void updateItem(Friend item, boolean empty) {
+        				super.updateItem(item, empty);
+
+        				if (empty || item == null) {
+        					setText(null);
+        					setGraphic(null);
+							getTooltip().setText(null);
+							// int oldIdx = getIndex()%10;
+							// getStyleClass().remove("friend"+oldIdx);
+        				} else {
+    						// int newIdx = getIndex()%10;
+    						// getStyleClass().add("friend"+newIdx);
+        					setText(item.getNick());
+							getTooltip().setText(item.getNick()+"@"+item.getHost());
+        				}
+        			}
+        		};
+        		cell.setTooltip(new Tooltip());
+        		// cell.setContextMenu(value);
         		log.finer("Cell created");
         		return cell;
         	}
@@ -196,6 +207,10 @@ public class ChatteController implements Initializable {
 		webView.setContextMenuEnabled(false);
 		viewEngine.setJavaScriptEnabled(true);
 		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm());
+		
+		
+		// create notification popup
+		notifPopup = new NotifPopup();
 	}
 
 	void doSendMessage() {
@@ -251,7 +266,32 @@ public class ChatteController implements Initializable {
 	// Toolbar button actions
 	
 	@FXML
-	void doOpenPreferences(ActionEvent event) {
+	void doRemoveContact(ActionEvent event) {
+		List<Friend> selected = new ArrayList<>(listView.getSelectionModel().getSelectedItems());
+		for(Friend friend : selected) {
+			if(friend == me) continue;
+			configService.removeFriend(friend);
+			listView.getItems().remove(friend);
+		}
+		
+		listView.getSelectionModel().clearSelection();
+	}
+	
+	@FXML
+	void doOpenPreferences(ActionEvent event) throws Exception {
+		// TODO display preferences window
+		if(preferencesWindow == null) {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("Preferences.fxml"), bundle);
+			loader.setControllerFactory(controllerFactory);
+			Parent preferencesPane = (Parent)loader.load();
+			preferencesController = loader.getController();
+			// load FXML
+			preferencesWindow = new Stage(StageStyle.UTILITY);
+			preferencesWindow.initOwner(mainWindow);
+			preferencesWindow.initModality(Modality.WINDOW_MODAL);
+			preferencesWindow.setScene(new Scene(preferencesPane));
+		}
+		preferencesWindow.showAndWait();
 		
 	}
 	
@@ -423,7 +463,9 @@ public class ChatteController implements Initializable {
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("displayMessage", htmlMessage);
 		history.recordMessage(htmlMessage, message.getResourceRefs());
-		mainWindow.toFront();
+		
+		notifPopup.show(mainWindow, message.getNick(), message.getMessage());
+		// mainWindow.toFront();
 	}
 	
 	public void displayStatusMessage(StatusMessage msg) {

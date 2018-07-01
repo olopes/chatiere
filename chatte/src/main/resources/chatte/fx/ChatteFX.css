@@ -60,3 +60,17 @@
 	-fx-text-fill: white;
 }
 
+.popup-notification {
+	-fx-background-color: #fff8dc;
+	-fx-background: #fff8dc;
+    -fx-fill: #fff8dc;
+    -fx-padding: 10;
+    -fx-border-color: black; 
+    -fx-border-width: 2;
+    -fx-font-size: 12pt;
+}
+
+.popup-notification .title-label {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+}
