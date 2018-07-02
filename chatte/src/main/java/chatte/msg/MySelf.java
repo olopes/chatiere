@@ -27,14 +27,18 @@ package chatte.msg;
 public class MySelf extends Friend {
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	public String getHost() {
-		return "...";
+	public MySelf() {
+		super.setConnected(true);
 	}
 	
 	@Override
-	public boolean isConnected() {
-		return true;
+	public String getHost() {
+		return "localhost";
+	}
+	
+	@Override
+	public void setConnected(boolean connected) {
+		// do nothing
 	}
 	
 	public boolean isMyself() {

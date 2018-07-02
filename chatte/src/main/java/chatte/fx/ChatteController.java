@@ -64,9 +64,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -80,7 +78,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Callback;
 import netscape.javascript.JSObject;
 
 public class ChatteController implements Initializable {
@@ -131,6 +128,7 @@ public class ChatteController implements Initializable {
 	HistoryLogger history;
 	ConfigService configService;
 	SoEnv soEnv;
+	int currentColor = 0;
 	
 	private String lastStyle="odd";
 	private Friend lastUser=null;
@@ -167,34 +165,13 @@ public class ChatteController implements Initializable {
 		HBox.setHgrow(rightSpring, Priority.ALWAYS);
 		
 		// configure friend list
-        listView.setCellFactory(new Callback<ListView<Friend>, ListCell<Friend>>() {
-        	@Override
-        	public ListCell<Friend> call(ListView<Friend> param) {
-        		ListCell<Friend> cell = new ListCell<Friend>() {
-        			protected void updateItem(Friend item, boolean empty) {
-        				super.updateItem(item, empty);
-
-        				if (empty || item == null) {
-        					setText(null);
-        					setGraphic(null);
-							getTooltip().setText(null);
-							// int oldIdx = getIndex()%10;
-							// getStyleClass().remove("friend"+oldIdx);
-        				} else {
-    						// int newIdx = getIndex()%10;
-    						// getStyleClass().add("friend"+newIdx);
-        					setText(item.getNick());
-							getTooltip().setText(item.getNick()+"@"+item.getHost());
-        				}
-        			}
-        		};
-        		cell.setTooltip(new Tooltip());
-        		// cell.setContextMenu(value);
-        		log.finer("Cell created");
-        		return cell;
-        	}
-        });
-        listView.getItems().add(me);
+        listView.setCellFactory(new FriendCellFactory());
+        List<Friend> knownFriends = configService.getKnownFriends();
+        for(Friend f : knownFriends) {
+        	f.setColor(UserColors.colors[currentColor]);
+        	currentColor = (currentColor+1) % UserColors.colors.length;
+        }
+        listView.getItems().addAll(knownFriends);
 		
 		// configure input area
 		WebEngine engine = inputArea.getEngine();
@@ -435,9 +412,8 @@ public class ChatteController implements Initializable {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div class=\"").append(lastStyle).append("\">");
 		if(newUser) {
-			int idx = listView.getItems().indexOf(msg.getFrom())%10;
-			String friendClass = "friend"+idx;
-			sb.append("<div class=\"from ").append(friendClass).append("\">")
+			String friendColor = lastUser.getColor();
+			sb.append("<div class=\"from\" style=\"color:").append(friendColor).append(";\">")
 			.append(msg.getFrom().getNick())
 			.append("</div>");
 		}

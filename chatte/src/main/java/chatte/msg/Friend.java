@@ -26,6 +26,7 @@ package chatte.msg;
 
 import java.io.Serializable;
 
+import chatte.fx.Fx;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -40,10 +41,12 @@ public class Friend implements Serializable {
 	
 	transient ReadOnlyBooleanWrapper connectedProperty;
 	transient ReadOnlyStringWrapper nickProperty;
+	transient ReadOnlyStringWrapper colorProperty;
 
 	public Friend() {
 		connectedProperty = new ReadOnlyBooleanWrapper(false);
 		nickProperty = new ReadOnlyStringWrapper();
+		colorProperty = new ReadOnlyStringWrapper();
 	}
 	
 	public String getNick() {
@@ -52,7 +55,7 @@ public class Friend implements Serializable {
 
 	public void setNick(String nick) {
 		this.nick = nick;
-		this.nickProperty.set(nick);
+		Fx.setInFxThread(this.nickProperty, nick);
 	}
 
 	public String getHost() {
@@ -76,15 +79,27 @@ public class Friend implements Serializable {
 	}
 
 	public void setConnected(boolean connected) {
-		this.connectedProperty.set(connected);
+		Fx.setInFxThread(this.connectedProperty, connected);
 	}
 	
+	public String getColor() {
+		return this.colorProperty.get();
+	}
+
+	public void setColor(String color) {
+		Fx.setInFxThread(this.colorProperty, color);
+	}
+
 	public ReadOnlyBooleanProperty connectedProperty() {
 		return connectedProperty.getReadOnlyProperty();
 	}
 	
 	public ReadOnlyStringProperty nickProperty() {
 		return nickProperty.getReadOnlyProperty();
+	}
+	
+	public ReadOnlyStringProperty colorProperty() {
+		return colorProperty.getReadOnlyProperty();
 	}
 	
 	@Override

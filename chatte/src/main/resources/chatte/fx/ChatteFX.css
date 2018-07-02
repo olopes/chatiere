@@ -52,10 +52,6 @@
 	-fx-font-weight: bold;
 }
 
-.user-list .list-cell {
-	-fx-text-fill: color;	
-}
-
 .user-list .list-cell:selected {
 	-fx-text-fill: white;
 }
