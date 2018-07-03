@@ -148,6 +148,7 @@ public class MsgListener implements Runnable {
 		// listen for connections
 		ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
 		try (ServerSocket server = factory.createServerSocket(getPort())) {
+			server.setSoTimeout(60000);
 			this.serverSocket = server;
 			while(running) {
 				try {
@@ -162,8 +163,7 @@ public class MsgListener implements Runnable {
 					MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 					new Thread(newWorker,"net client "+host).start();
 				} catch(SocketTimeoutException ex) {
-					log.finest("socket timeout");
-					System.out.println(".");
+					log.finest("socket timeout; continuing");
 				} catch(IOException ex) {
 					log.log(Level.SEVERE, "Connection error", ex);
 				}

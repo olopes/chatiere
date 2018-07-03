@@ -39,6 +39,7 @@ import chatte.msg.ChatoMessageBroker;
 import chatte.msg.MessageBroker;
 import chatte.msg.StopServicesMessage;
 import chatte.net.ChatoURLStreamHandlerFactory;
+import chatte.plugin.ChattePluginLoader;
 import chatte.resources.ChatoResourceManager;
 import chatte.resources.ResourceManager;
 import chatte.resources.ResourceRequestHandler;
@@ -189,6 +190,8 @@ public class ChatteFX extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
+		ChattePluginLoader.loadPlugins(controller);
+		
 		// Ask for keystore password. It won't connect to the network is the password is wrong
 		Stage passwordStage = new Stage(StageStyle.UTILITY);
 		passwordStage.initOwner(primaryStage);
@@ -201,6 +204,7 @@ public class ChatteFX extends Application {
 			primaryStage.hide();
 			return;
 		}
+		
 	}
 
 	@Override

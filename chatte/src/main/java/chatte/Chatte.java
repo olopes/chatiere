@@ -25,6 +25,7 @@
 package chatte;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -43,6 +44,14 @@ public class Chatte {
 		}
 		return false;
 	}
+	
+	static class ClasspathFileFilter implements FileFilter {
+		@Override
+		public boolean accept(File pathname) {
+			String lowerName = pathname.getName().toLowerCase();
+			return pathname.isDirectory() || lowerName.endsWith(".jar") || lowerName.endsWith(".zip");
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
 		/*
@@ -53,6 +62,16 @@ public class Chatte {
 			System.out.println("Launcher is URLClassLoader!");
 			URL [] oldClassPath = ((URLClassLoader)cl).getURLs();
 			System.out.println(Arrays.asList(oldClassPath));
+			Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			addURL.setAccessible(true);
+
+			// append "ext" folder contents
+			File ext = new File("ext");
+			if(ext.exists() && ext.isDirectory()) {
+				for(File dependency : ext.listFiles(new ClasspathFileFilter())) {
+					addURL.invoke(cl, dependency.toURI().toURL());
+				}
+			}
 			
 			// check if jfxrt.jar is already in the classpath
 			boolean jfxrtFound = hasJfxrt((URLClassLoader)cl);
@@ -70,8 +89,6 @@ public class Chatte {
 				File jfxrt = new File(new File(javaHome, "lib"), "jfxrt.jar");
 				System.out.println("jfxrt.jar location: "+jfxrt);
 
-				Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-				addURL.setAccessible(true);
 				addURL.invoke(cl, jfxrt.toURI().toURL());
 				URL [] newClassPath = ((URLClassLoader)cl).getURLs();
 				System.out.println("Fixed classpath:");

@@ -80,7 +80,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import netscape.javascript.JSObject;
 
-public class ChatteController implements Initializable {
+public class ChatteController implements Initializable, ChatteContext {
 	// components injected by FXML
 	
 	// Views
@@ -146,6 +146,31 @@ public class ChatteController implements Initializable {
 		this.me = configService.getSelf();
 		this.messageBroker.addListener(this);
 		soEnv = SoEnv.getEnv();
+	}
+
+	@Override
+	public Friend getMyself() {
+		return this.me;
+	}
+	
+	@Override
+	public ResourceBundle getResourceBundle() {
+		return this.bundle;
+	}
+
+	@Override
+	public MessageBroker getMessageBroker() {
+		return this.messageBroker;
+	}
+
+	@Override
+	public ResourceManager getResourceManager() {
+		return this.resourceManager;
+	}
+
+	@Override
+	public ConfigService getConfigService() {
+		return this.configService;
 	}
 
 	public Stage getMainWindow() {
@@ -398,9 +423,6 @@ public class ChatteController implements Initializable {
 	
 	String convertChatMessage(final ChatMessage msg) {
 
-		System.out.println("Chat message recieved from "+msg.getFrom());
-		System.out.println(msg.getMessage());
-		
 		Date received = new Date();
 		boolean newUser = false;
 		if(lastUser != msg.getFrom()) {
@@ -426,7 +448,7 @@ public class ChatteController implements Initializable {
 		.append("</div>")
 		.append("</div>");
 		// sb.append("<div><img src=\"").append(new File("img/hello.gif").toURI().toURL()).append("\" /></div>");
-		// System.out.println(sb);
+
 		return sb.toString();
 	}
 
