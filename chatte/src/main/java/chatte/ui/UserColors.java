@@ -27,15 +27,15 @@ package chatte.ui;
 public interface UserColors {
 
 	final String [] colors = {
-			"a500ff",
-			"ffa500",
-			"59ff00",
-			"0059ff",
-			"aa632c",
-			"f43d3d",
-			"3bc126",
-			"26c1ad",
-			"26adc1",
-			"10b71b",
+			"#a500ff",
+			"#ffa500",
+			"#59ff00",
+			"#0059ff",
+			"#aa632c",
+			"#f43d3d",
+			"#3bc126",
+			"#26c1ad",
+			"#26adc1",
+			"#10b71b",
 	};
 }

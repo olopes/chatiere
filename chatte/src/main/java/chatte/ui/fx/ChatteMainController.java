@@ -54,6 +54,7 @@ import chatte.msg.StatusMessage;
 import chatte.msg.TypedMessage;
 import chatte.msg.WelcomeMessage;
 import chatte.resources.ResourceManager;
+import chatte.ui.UserColors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
