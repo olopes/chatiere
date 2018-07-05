@@ -24,6 +24,9 @@
  */
 package chatte.msg;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class ConfigMessage extends AbstractMessage {
 	private static final long serialVersionUID = 1L;
 

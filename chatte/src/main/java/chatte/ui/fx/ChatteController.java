@@ -22,26 +22,11 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.stage.Window;
 
-import chatte.config.ConfigService;
-import chatte.msg.MessageBroker;
-import chatte.resources.ResourceManager;
-import javafx.fxml.Initializable;
+public interface ChatteController {
 
-public class PreferencesController implements Initializable {
-
-	public PreferencesController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
-	}
-
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
+	Window getWindow();
 }

@@ -24,8 +24,8 @@
  */
 package chatte.plugin.spi;
 
-import chatte.fx.ChatteContext;
 import chatte.plugin.ChattePlugin;
+import chatte.ui.fx.ChatteContext;
 
 public class SampleChattePluginProvider implements ChattePluginProvider {
 

@@ -22,35 +22,26 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
-import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.StringProperty;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class Fx {
+import chatte.config.ConfigService;
+import chatte.msg.MessageBroker;
+import chatte.resources.ResourceManager;
+import javafx.fxml.Initializable;
 
-	public static void setInFxThread(final StringProperty prop, final String value) {
-		if (Platform.isFxApplicationThread())
-			prop.set(value);
-		else
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					prop.set(value);
-				}
-			});
+public class PreferencesController implements Initializable {
+
+	public PreferencesController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
 	}
 
-	public static void setInFxThread(final BooleanProperty prop, final boolean value) {
-		if (Platform.isFxApplicationThread())
-			prop.set(value);
-		else
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					prop.set(value);
-				}
-			});
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		// TODO Auto-generated method stub
+		
 	}
+
+
 }

@@ -99,7 +99,7 @@ public class Chatte {
 		}
 		
 		System.out.println("Loading ChatteFX class");
-		Class<?> cc = cl.loadClass("chatte.fx.ChatteFX");
+		Class<?> cc = cl.loadClass("chatte.ui.fx.ChatteFX");
 		Method main = cc.getDeclaredMethod("main", String[].class);
 		System.out.println("Starting ChatteFX");
 		main.invoke(null, (Object)args);

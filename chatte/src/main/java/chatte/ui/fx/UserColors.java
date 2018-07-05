@@ -22,40 +22,20 @@
  * SOFTWARE.
  * 
  */
-package chatte.msg;
+package chatte.ui.fx;
 
-import javax.xml.bind.annotation.XmlRootElement;
+public interface UserColors {
 
-@XmlRootElement(name="REME")
-public class ResourceMessage extends AbstractMessage {
-	private static final long serialVersionUID = 1L;
-
-	String type;
-	byte[] contents;
-
-	public ResourceMessage() {
-	}
-
-	public ResourceMessage(Friend from, String type, byte[] contents) {
-		setFrom(from);
-		this.type = type;
-		this.contents = contents;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public byte[] getContents() {
-		return contents;
-	}
-
-	public void setContents(byte[] contents) {
-		this.contents = contents;
-	}
-
+	final String [] colors = {
+			"#a500ff",
+			"#ffa500",
+			"#59ff00",
+			"#0059ff",
+			"#aa632c",
+			"#f43d3d",
+			"#3bc126",
+			"#26c1ad",
+			"#26adc1",
+			"#10b71b",
+	};
 }

@@ -22,7 +22,7 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class ChatteFX extends Application {
 				}
 			}
 		}
-		Logger.getLogger("chatte.fx.ChatteFX").severe("Starting ChatteFX");
+		Logger.getLogger("chatte.ui.fx.ChatteFX").severe("Starting ChatteFX");
 		launch(ChatteFX.class, args);
 	}
 
@@ -103,7 +103,7 @@ public class ChatteFX extends Application {
 
 		// Application.Parameters parameters = getParameters();
 
-		resourceBundle = ResourceBundle.getBundle("chatte.fx.Bundle"); 
+		resourceBundle = ResourceBundle.getBundle("chatte.ui.fx.Bundle"); 
 
 		configService = new ConfigServiceImpl();
 		resourceManager = new ChatoResourceManager();
@@ -156,8 +156,8 @@ public class ChatteFX extends Application {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resourceBundle);
 		loader.setControllerFactory(controllerFactory);
 		Parent root = (Parent)loader.load();
-		ChatteController controller = loader.getController();
-		controller.setMainWindow(primaryStage);
+		ChatteMainController controller = loader.getController();
+		controller.setWindow(primaryStage);
 		
 
 		// register UI message listener

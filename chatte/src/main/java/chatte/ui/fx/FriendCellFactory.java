@@ -22,40 +22,27 @@
  * SOFTWARE.
  * 
  */
-package chatte.msg;
+package chatte.ui.fx;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.logging.Logger;
 
-@XmlRootElement(name="REME")
-public class ResourceMessage extends AbstractMessage {
-	private static final long serialVersionUID = 1L;
+import chatte.msg.Friend;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.util.Callback;
 
-	String type;
-	byte[] contents;
-
-	public ResourceMessage() {
+public class FriendCellFactory implements Callback<ListView<Friend>, ListCell<Friend>> {
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
 	}
-
-	public ResourceMessage(Friend from, String type, byte[] contents) {
-		setFrom(from);
-		this.type = type;
-		this.contents = contents;
+	
+	@Override
+	public ListCell<Friend> call(ListView<Friend> param) {
+		ListCell<Friend> cell = new FriendListCell();
+		// cell.setContextMenu(value);
+		log.finer("Cell created");
+		return cell;
 	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public byte[] getContents() {
-		return contents;
-	}
-
-	public void setContents(byte[] contents) {
-		this.contents = contents;
-	}
-
+	
 }

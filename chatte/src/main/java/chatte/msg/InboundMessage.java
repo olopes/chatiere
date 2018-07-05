@@ -22,27 +22,26 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.msg;
 
-import java.util.logging.Logger;
+public class InboundMessage extends AbstractMessage {
+	private static final long serialVersionUID = 1L;
+	
+	byte[] contents;
 
-import chatte.msg.Friend;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.util.Callback;
-
-public class FriendCellFactory implements Callback<ListView<Friend>, ListCell<Friend>> {
-	private Logger log = getLogger();
-	Logger getLogger() {
-		return Logger.getLogger(getClass().getName());
+	public InboundMessage() {
 	}
 	
-	@Override
-	public ListCell<Friend> call(ListView<Friend> param) {
-		ListCell<Friend> cell = new FriendListCell();
-		// cell.setContextMenu(value);
-		log.finer("Cell created");
-		return cell;
+	public InboundMessage(byte[] contents) {
+		setContents(contents);
 	}
 	
+	public byte[] getContents() {
+		return contents;
+	}
+
+	public void setContents(byte[] contents) {
+		this.contents = contents;
+	}
+
 }

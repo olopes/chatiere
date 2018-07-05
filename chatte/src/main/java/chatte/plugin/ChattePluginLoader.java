@@ -30,11 +30,11 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
-import chatte.fx.ChatteContext;
 import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
 import chatte.msg.PluginRegistedMessage;
 import chatte.plugin.spi.ChattePluginProvider;
+import chatte.ui.fx.ChatteContext;
 
 public class ChattePluginLoader {
 

@@ -27,6 +27,9 @@ package chatte.msg;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="WELC")
 public class WelcomeMessage extends AbstractMessage {
 	private static final long serialVersionUID = 1L;
 

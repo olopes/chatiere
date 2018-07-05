@@ -26,6 +26,9 @@ package chatte.msg;
 
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="MESS")
 public class ChatMessage extends AbstractMessage {
 	private static final long serialVersionUID = 1L;
 

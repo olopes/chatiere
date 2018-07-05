@@ -27,12 +27,18 @@ package chatte.msg;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 public abstract class AbstractMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@XmlTransient
 	transient boolean complete;
+	@XmlTransient
 	transient Friend from;
+	@XmlTransient
 	transient boolean resourcesRequested;
+	@XmlTransient
 	transient boolean remote;
 
 	public AbstractMessage() {

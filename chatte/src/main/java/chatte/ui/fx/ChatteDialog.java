@@ -22,7 +22,7 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
 import java.util.logging.Logger;
 

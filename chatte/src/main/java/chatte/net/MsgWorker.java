@@ -25,21 +25,19 @@
 package chatte.net;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import chatte.msg.AbstractMessage;
-import chatte.msg.ChatMessage;
 import chatte.msg.DisconnectedMessage;
 import chatte.msg.Friend;
+import chatte.msg.InboundMessage;
 import chatte.msg.MessageBroker;
 import chatte.msg.MessageListener;
-import chatte.msg.ResourceMessage;
-import chatte.msg.ResourceRequestMessage;
-import chatte.msg.TypedMessage;
+import chatte.msg.OutboundMessage;
 import chatte.msg.WelcomeMessage;
 
 public class MsgWorker implements Runnable {
@@ -54,8 +52,8 @@ public class MsgWorker implements Runnable {
 	
 	
 	final Friend me;
-	ObjectInputStream in;
-	ObjectOutputStream out;
+	InputStream in;
+	OutputStream out;
 	
 	public MsgWorker(Friend friend, MessageBroker messageBroker, MsgListener server, Socket sock) {
 		this.messageBroker = messageBroker;
@@ -64,8 +62,8 @@ public class MsgWorker implements Runnable {
 		this.me = friend;
 
 		try {
-			out = new ObjectOutputStream(sock.getOutputStream());
-			in = new ObjectInputStream(sock.getInputStream());
+			out = sock.getOutputStream();
+			in = sock.getInputStream();
 			log.info("1. Streams created");
 		} catch(Exception e) {
 			log.log(Level.SEVERE, "Socket stream creation failed", e);
@@ -74,41 +72,19 @@ public class MsgWorker implements Runnable {
 	}
 
 	@MessageListener
-	public void sendTypedMessage(TypedMessage message) {
+	public void sendOutboundMessage(OutboundMessage message) {
 		log.fine("sending message "+message);
+		if(message.getContents()==null) return;
 		try {
-			out.writeObject(new ChatMessage(message));
+			String sizeStr = String.format("%08x", message.getContents().length);
+			out.write(sizeStr.getBytes());
+			out.write(message.getContents());
 			out.flush();
 		} catch(IOException e) {
 			messageBroker.sendMessage(new DisconnectedMessage(me));
 		}
 	}
 	
-	@MessageListener
-	public void sendResourceRequest(ResourceRequestMessage message) {
-		log.fine("preparing to send message "+message);
-		if(message.getFrom() == me && !message.isRemote()) {
-			try {
-				out.writeObject(message);
-				out.flush();
-			} catch(IOException e) {
-				messageBroker.sendMessage(new DisconnectedMessage(me));
-			}
-		}
-	}
-	
-	@MessageListener
-	public void sendResource(ResourceMessage message) {
-		log.fine("preparing to send message "+message);
-		if(message.getFrom() == me && !message.isRemote()) {
-			try {
-				out.writeObject(message);
-				out.flush();
-			} catch(IOException e) {
-				messageBroker.sendMessage(new DisconnectedMessage(me));
-			}
-		}
-	}
 	
 	void dispatchMessage(AbstractMessage message) {
 		log.fine(" => dispatching received message :-D ("+message.getClass().getSimpleName()+")");
@@ -129,27 +105,25 @@ public class MsgWorker implements Runnable {
 			welcome.setNick(server.getNick()); // from config
 			welcome.setPort(server.getPort()); // from config
 			welcome.setKnownFriends(server.getConnectedFriends());
-
-			out.writeObject(welcome);
-			out.flush();
+			log.info("1. Welcome message ready");
+			sendOutboundMessage(NetCodec.convertMessage(welcome));
 
 			log.info("2. Welcome message sent");
 			
-			WelcomeMessage greeting = (WelcomeMessage) in.readObject();
-			log.info("3. Greeting received");
-			dispatchMessage(greeting);
-			
-			log.info("4. Waiting...");
+			log.info("3. Waiting...");
+			byte [] sizebuf = new byte[8];
 			while(sock.isConnected()) {
-				try {
-					AbstractMessage message = (AbstractMessage) in.readObject();
-					dispatchMessage(message);
-				} catch(ClassNotFoundException ex) {
-					log.log(Level.SEVERE, "Bad message type received: "+ex.getMessage());
-				}
+				// shitty shit can be shitty if one is not careful enough
+				int nread = in.read(sizebuf);
+				int messageSize = Integer.parseInt(new String(sizebuf), 16);
+				byte [] contents = new byte[messageSize];
+				nread = in.read(contents);
+
+				InboundMessage message = new InboundMessage(contents);
+				dispatchMessage(message);
 			}
 			
-		} catch(IOException | ClassNotFoundException e) {
+		} catch(IOException e) {
 			log.log(Level.SEVERE, "Something bad happened....", e);
 		} finally {
 			log.info("4. Disconnected.");

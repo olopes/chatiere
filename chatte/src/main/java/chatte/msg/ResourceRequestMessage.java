@@ -26,6 +26,9 @@ package chatte.msg;
 
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="RERE")
 public class ResourceRequestMessage extends AbstractMessage {
 	private static final long serialVersionUID = 1L;
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -80,7 +80,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import netscape.javascript.JSObject;
 
-public class ChatteController implements Initializable, ChatteContext {
+public class ChatteMainController implements Initializable, ChatteContext, ChatteController {
 	// components injected by FXML
 	
 	// Views
@@ -118,7 +118,7 @@ public class ChatteController implements Initializable, ChatteContext {
 
 	
 	// class specific stuff
-	Stage mainWindow;
+	Stage window;
 	Stage pickerStage;
 	WebView pickerView;
 	ResourceBundle bundle;
@@ -138,7 +138,7 @@ public class ChatteController implements Initializable, ChatteContext {
 		return Logger.getLogger(getClass().getName());
 	}
 
-	public ChatteController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+	public ChatteMainController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
 		this.messageBroker=messageBroker;
 		this.resourceManager = resourceManager;
 		this.history = new HistoryLoggerImpl(messageBroker, configService, resourceManager);
@@ -173,12 +173,18 @@ public class ChatteController implements Initializable, ChatteContext {
 		return this.configService;
 	}
 
-	public Stage getMainWindow() {
-		return mainWindow;
+	@Override
+	public ChatteController getMainController() {
+		return this;
+	}
+	
+	@Override
+	public Stage getWindow() {
+		return window;
 	}
 
-	public void setMainWindow(Stage mainWindow) {
-		this.mainWindow = mainWindow;
+	public void setWindow(Stage window) {
+		this.window = window;
 	}
 	
 	@Override
@@ -250,7 +256,7 @@ public class ChatteController implements Initializable, ChatteContext {
 	void doExit(ActionEvent event) {
 		log.fine("Window close request");
 		ChatteDialog dialog = new ChatteDialog(
-				mainWindow,
+				window,
 				bundle.getString("dialog.close.title"),
 				bundle.getString("dialog.close.message"),
 				new String [] {
@@ -260,7 +266,7 @@ public class ChatteController implements Initializable, ChatteContext {
 				);
 		int selected = dialog.showDialog();
 		if(selected == 1) {
-			mainWindow.close();
+			window.close();
 		}
 
 	}
@@ -289,7 +295,7 @@ public class ChatteController implements Initializable, ChatteContext {
 			preferencesController = loader.getController();
 			// load FXML
 			preferencesWindow = new Stage(StageStyle.UTILITY);
-			preferencesWindow.initOwner(mainWindow);
+			preferencesWindow.initOwner(window);
 			preferencesWindow.initModality(Modality.WINDOW_MODAL);
 			preferencesWindow.setScene(new Scene(preferencesPane));
 		}
@@ -301,7 +307,7 @@ public class ChatteController implements Initializable, ChatteContext {
 	void doOpenEmoticonPanel(ActionEvent event) {
 		if(pickerStage == null) {
 			pickerStage = new Stage();
-			pickerStage.initOwner(mainWindow);
+			pickerStage.initOwner(window);
 			pickerView = new WebView();
 			pickerView.setContextMenuEnabled(false);
 			
@@ -315,7 +321,7 @@ public class ChatteController implements Initializable, ChatteContext {
 						public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
 							if (newState == State.SUCCEEDED) {
 								JSObject htmlWindow = (JSObject) pickerView.getEngine().executeScript("window");
-								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteController.this));
+								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteMainController.this));
 								htmlWindow.call("loadResources", (Object)resourceManager.getResources());
 							}
 						}
@@ -332,7 +338,7 @@ public class ChatteController implements Initializable, ChatteContext {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(bundle.getString("dialog.addEmoticon.title"));
 		fileChooser.getExtensionFilters().add(new ExtensionFilter(bundle.getString("dialog.addEmoticon.filter"), resourceManager.getValidFileExtensions()));
-		File selected = fileChooser.showOpenDialog(mainWindow);
+		File selected = fileChooser.showOpenDialog(window);
 		if(selected != null) {
 			String newResource = resourceManager.addResource(selected);
 			if(newResource != null)
@@ -401,7 +407,7 @@ public class ChatteController implements Initializable, ChatteContext {
 		WebEngine engine = webView.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("clearScreen");
-		mainWindow.setIconified(true);
+		window.setIconified(true);
 		inputArea.requestFocus();
 	}
 	
@@ -462,7 +468,7 @@ public class ChatteController implements Initializable, ChatteContext {
 		htmlWindow.call("displayMessage", htmlMessage);
 		history.recordMessage(htmlMessage, message.getResourceRefs());
 		
-		notifPopup.show(mainWindow, message.getNick(), message.getMessage());
+		notifPopup.show(window, message.getNick(), message.getMessage());
 		// mainWindow.toFront();
 	}
 	
@@ -482,7 +488,7 @@ public class ChatteController implements Initializable, ChatteContext {
 		JSObject htmlWindow = (JSObject) engine.executeScript("window");
 		htmlWindow.call("displayMessage", htmlMessage);
 		history.recordMessage(htmlMessage, null);
-		mainWindow.toFront();
+		window.toFront();
 	}
 
 	public void welcomeFriend(final WelcomeMessage message) {

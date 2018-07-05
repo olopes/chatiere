@@ -71,10 +71,10 @@ public class HistoryLoggerImpl implements HistoryLogger {
 			Path hist = Paths.get("chatlog");
 			Files.createDirectories(hist);
 			if(!Files.exists(hist.resolve("ChatView.css"))) {
-				Files.copy(getClass().getResourceAsStream("/chatte/fx/ChatView.css"), hist.resolve("ChatView.css"));
+				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/ChatView.css"), hist.resolve("ChatView.css"));
 			}
 			if(!Files.exists(hist.resolve("OpenSansEmoji.ttf"))) {
-				Files.copy(getClass().getResourceAsStream("/chatte/fx/OpenSansEmoji.ttf"), hist.resolve("OpenSansEmoji.ttf"));
+				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/OpenSansEmoji.ttf"), hist.resolve("OpenSansEmoji.ttf"));
 			}
 			String histFileName = new SimpleDateFormat("'ChatLog_'yyyyMMdd_HHmmss'.html'").format(now);
 			String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now);

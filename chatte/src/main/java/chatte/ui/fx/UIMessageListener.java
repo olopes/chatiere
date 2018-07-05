@@ -22,28 +22,59 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.ui.fx;
 
+import chatte.msg.ChatMessage;
+import chatte.msg.DisconnectedMessage;
+import chatte.msg.MessageListener;
+import chatte.msg.TypedMessage;
+import chatte.msg.WelcomeMessage;
 import javafx.application.Platform;
-import javafx.stage.Stage;
 
-public class JavascritpAdapter {
-	Stage stage;
-	ChatteController controller;
+public class UIMessageListener {
 
-	public JavascritpAdapter(Stage stage, ChatteController controller) {
-		this.stage=stage;
-		this.controller=controller;
+	ChatteMainController controller;
+	
+	public UIMessageListener(ChatteMainController controller) {
+		this.controller = controller;
 	}
 	
-	public void select(final String resource) {
-		Platform.runLater(new Runnable() {
-			@Override
+	@MessageListener
+	public void messageTyped(final TypedMessage message) {
+		// ask to run in JavaFX thread
+		Platform.runLater(new Runnable(){
 			public void run() {
-				controller.appendInputImage(resource.replaceFirst("chato:", ""));
-				//stage.close();
+				controller.messageTyped(message);
+			}
+		});
+	}
+	
+	@MessageListener
+	public void chatMessageReceived(final ChatMessage message) {
+		// ask to run in JavaFX thread
+		Platform.runLater(new Runnable(){
+			public void run() {
+				controller.chatMessageReceived(message);
 			}
 		});
 	}
 
+	@MessageListener
+	public void welcomeFriend(final WelcomeMessage message) {
+		Platform.runLater(new Runnable(){
+			public void run() {
+				controller.welcomeFriend(message);
+			}
+		});
+	}
+	
+	@MessageListener
+	public void byebyeFriend(final DisconnectedMessage message) {
+		Platform.runLater(new Runnable(){
+			public void run() {
+				controller.byebyeFriend(message);
+			}
+		});
+	}
+	
 }

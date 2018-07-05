@@ -22,32 +22,26 @@
  * SOFTWARE.
  * 
  */
-package chatte.fx;
+package chatte.msg;
 
-public enum SoEnv {
-	generic(),
-	windows("cmd.exe", "/c", "START", "%WINDIR%\\system32\\SnippingTool.exe"),
-	kde("spectacle"),
-	gnome("gnome-screenshot", "-i"),
-	;
-	final String [] cmd;
-	SoEnv(String ... cmd) {
-		this.cmd = cmd;
+public class OutboundMessage extends AbstractMessage {
+	private static final long serialVersionUID = 1L;
+	
+	byte[] contents;
+	
+	public OutboundMessage() {
 	}
 	
-	public String [] getCmd() {
-		return cmd;
+	public OutboundMessage(byte[] contents) {
+		setContents(contents);
 	}
-	
-	public static SoEnv getEnv() {
-		if(System.getProperty("os.name").startsWith("Windows")) {
-			return windows;
-		} else if ("KDE".equals(System.getenv("XDG_CURRENT_DESKTOP"))){
-			return kde;
-		} else if ("GNOME".equals(System.getenv("XDG_CURRENT_DESKTOP"))){
-			return gnome;
-		} else {
-			return generic;
-		}
+
+	public byte[] getContents() {
+		return contents;
 	}
+
+	public void setContents(byte[] contents) {
+		this.contents = contents;
+	}
+
 }

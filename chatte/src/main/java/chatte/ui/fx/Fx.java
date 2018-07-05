@@ -22,40 +22,35 @@
  * SOFTWARE.
  * 
  */
-package chatte.msg;
+package chatte.ui.fx;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 
-@XmlRootElement(name="REME")
-public class ResourceMessage extends AbstractMessage {
-	private static final long serialVersionUID = 1L;
+public class Fx {
 
-	String type;
-	byte[] contents;
-
-	public ResourceMessage() {
+	public static void setInFxThread(final StringProperty prop, final String value) {
+		if (Platform.isFxApplicationThread())
+			prop.set(value);
+		else
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					prop.set(value);
+				}
+			});
 	}
 
-	public ResourceMessage(Friend from, String type, byte[] contents) {
-		setFrom(from);
-		this.type = type;
-		this.contents = contents;
+	public static void setInFxThread(final BooleanProperty prop, final boolean value) {
+		if (Platform.isFxApplicationThread())
+			prop.set(value);
+		else
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					prop.set(value);
+				}
+			});
 	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public byte[] getContents() {
-		return contents;
-	}
-
-	public void setContents(byte[] contents) {
-		this.contents = contents;
-	}
-
 }
