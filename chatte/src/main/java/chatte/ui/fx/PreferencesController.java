@@ -24,24 +24,29 @@
  */
 package chatte.ui.fx;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
 
-public class PreferencesController implements Initializable {
+public class PreferencesController extends BaseChatteController {
+	
+	@FXML Parent preferences;
+	
+	@FXML Button okButton;
+	@FXML Button cancelButton;
+	
 
 	public PreferencesController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+		super(configService, resourceManager, messageBroker);
 	}
 
-	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {
+	public Parent getRoot() {
 		// TODO Auto-generated method stub
-		
+		return preferences;
 	}
-
+	
 
 }

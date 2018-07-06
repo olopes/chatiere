@@ -24,45 +24,60 @@
  */
 package chatte.ui.fx;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
 import chatte.config.ConfigService;
-import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
-import chatte.msg.NewFriendMessage;
 import chatte.resources.ResourceManager;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
-public class ContactsController extends BaseChatteController {
+public abstract class BaseChatteController implements Initializable, ChatteController {
 	
-	@FXML VBox contactsPanel;
-	@FXML TextField nick;
-	@FXML TextField host;
-	@FXML TextField port;
+	Stage window;
 	
-	@FXML Button okButton;
-
-	public ContactsController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
-		super(configService, resourceManager, messageBroker);
+	ConfigService configService;
+	MessageBroker messageBroker;
+	
+	final Logger log;
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
 	}
-
-	@FXML 
-	void doConnect(ActionEvent event) {
-		log.fine("Window close request");
-		Friend friend = new Friend();
-		friend.setNick(nick.getText());
-		friend.setHost(host.getText());
-		friend.setPort(Integer.parseInt(port.getText()));
-		configService.addFriend(friend);
-		messageBroker.sendMessage(new NewFriendMessage(friend));
+	
+	public BaseChatteController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+		log = getLogger();
+		this.configService = configService;
+		this.messageBroker = messageBroker;
 	}
 
 	@Override
-	public Parent getRoot() {
-		return contactsPanel;
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		// do nothing
+	}
+
+	@Override
+	public synchronized Window createWindow(Window parent) {
+		// TODO display preferences window
+		if(window == null) {
+			// load FXML
+			window = new Stage(StageStyle.UTILITY);
+			window.initOwner(parent);
+			window.initModality(Modality.WINDOW_MODAL);
+			window.setScene(new Scene(getRoot()));
+		}
+		// preferencesWindow.showAndWait();
+		
+		return window;
+	}
+
+	public void showWindow(Window owner) {
+		((Stage)createWindow(owner)).showAndWait();
 	}
 
 

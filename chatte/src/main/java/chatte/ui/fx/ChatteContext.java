@@ -30,7 +30,6 @@ import chatte.config.ConfigService;
 import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
-import javafx.stage.Stage;
 
 public interface ChatteContext {
 

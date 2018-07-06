@@ -33,7 +33,7 @@ SOFTWARE.
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane hgap="14.0" maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane fx:id="alertPanel" hgap="14.0" maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.AlertController">
   <children>
     <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="TOP">
       <image>
@@ -56,7 +56,7 @@ SOFTWARE.
     </VBox>
     <HBox maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
       <children>
-        <HBox fx:id="actionParent" alignment="CENTER">
+        <HBox alignment="CENTER">
           <HBox.margin>
             <Insets />
           </HBox.margin>
@@ -67,7 +67,7 @@ SOFTWARE.
             <Insets />
           </HBox.margin>
         </Button>
-        <HBox fx:id="okParent" alignment="CENTER">
+        <HBox alignment="CENTER">
           <children>
             <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" text="Ok" HBox.hgrow="NEVER">
               <HBox.margin>

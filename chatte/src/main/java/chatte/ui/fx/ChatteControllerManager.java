@@ -24,13 +24,26 @@
  */
 package chatte.ui.fx;
 
-import javafx.scene.Parent;
-import javafx.stage.Window;
+import java.io.IOException;
 
-public interface ChatteController {
+import javafx.fxml.FXMLLoader;
 
-	Window createWindow(Window owner);
+public class ChatteControllerManager {
 	
-	Parent getRoot();
-	
+	ControllerFactory controllerFactory;
+	public ChatteControllerManager(ControllerFactory controllerFactory) {
+		this.controllerFactory = controllerFactory;
+	}
+
+	public <T extends ChatteController> T newFxml(String fxml, ChatteContext context) {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml), context.getResourceBundle());
+		loader.setControllerFactory(controllerFactory);
+		try {
+			loader.load();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
+		return loader.getController();
+	}
+
 }

@@ -35,7 +35,7 @@ SOFTWARE.
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TabPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.ChatteMainControllerller">
+<BorderPane fx:id="chattefx" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.ChatteMainControllerller">
 <stylesheets>
 	<URL value="@ChatteFX.css" />
 </stylesheets>

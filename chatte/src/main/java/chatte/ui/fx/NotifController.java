@@ -24,13 +24,44 @@
  */
 package chatte.ui.fx;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import chatte.config.ConfigService;
+import chatte.msg.MessageBroker;
+import chatte.resources.ResourceManager;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
-public interface ChatteController {
+public class NotifController extends BaseChatteController {
 
-	Window createWindow(Window owner);
+	NotifPopup window;
 	
-	Parent getRoot();
+	public NotifController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+		super(configService, resourceManager, messageBroker);
+	}
+
+	@Override
+	public void initialize(URL baseUrl, ResourceBundle bundle) {
+		window = new NotifPopup();
+	}
+
+	@Override
+	public Window createWindow(Window parent) {
+		return window;
+	}
+
+	public void show(Stage owner, String title, String message) {
+		window.show(owner, title, message);
+	}
+
+	@Override
+	public Parent getRoot() {
+		return null;
+	}
 	
+	@Override
+	public void showWindow(Window owner) {
+	}
 }

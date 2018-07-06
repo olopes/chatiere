@@ -157,7 +157,7 @@ public class ChatteFX extends Application {
 		loader.setControllerFactory(controllerFactory);
 		Parent root = (Parent)loader.load();
 		ChatteMainController controller = loader.getController();
-		controller.setWindow(primaryStage);
+		controller.setupWindows(primaryStage);
 		
 
 		// register UI message listener

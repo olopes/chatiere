@@ -24,13 +24,30 @@
  */
 package chatte.ui.fx;
 
+import chatte.config.ConfigService;
+import chatte.msg.MessageBroker;
+import chatte.resources.ResourceManager;
+import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.stage.Window;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
-public interface ChatteController {
+public class AlertController extends BaseChatteController {
 
-	Window createWindow(Window owner);
+	@FXML GridPane alertPanel;
+	@FXML Label messageLabel;
+	@FXML Label detailsLabel;
+	@FXML Button cancelButton;
+	@FXML Button okButton;
 	
-	Parent getRoot();
-	
+	public AlertController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+		super(configService, resourceManager, messageBroker);
+	}
+
+	@Override
+	public Parent getRoot() {
+		return alertPanel;
+	}
+
 }

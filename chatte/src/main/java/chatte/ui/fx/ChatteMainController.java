@@ -60,7 +60,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -68,21 +67,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import netscape.javascript.JSObject;
 
 public class ChatteMainController implements Initializable, ChatteContext, ChatteController {
 	// components injected by FXML
+	@FXML BorderPane chattefx;
 	
 	// Views
 	@FXML ListView<Friend> listView;
@@ -110,12 +109,10 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	@FXML ControllerFactory controllerFactory;
 
 	// windows, dialogs and stuff
-	Stage preferencesWindow;
 	PreferencesController preferencesController;
-	@FXML VBox contactPanel;
-	@FXML ContactsController contactPanelController;
-	NotifPopup notifPopup;
-	PreferencesController notifPopupController;
+	ContactsController contactPanelController;
+	NotifController notifPopupController;
+	AlertController alertController;
 
 	
 	// class specific stuff
@@ -180,12 +177,31 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	}
 	
 	@Override
+	public Parent getRoot() {
+		return chattefx;
+	}
+	
+	@Override
+	public Window createWindow(Window parent) {
+		return getWindow();
+	}
+
 	public Stage getWindow() {
 		return window;
 	}
 
-	public void setWindow(Stage window) {
-		this.window = window;
+	void setupWindows(Stage mainWindow) {
+		this.window = mainWindow;
+		ChatteControllerManager manager = new ChatteControllerManager(controllerFactory);
+		// create notification popup
+
+		// notifPopup = new NotifPopup();
+		alertController = manager.newFxml("Alert.fxml", this);
+		notifPopupController = manager.newFxml("NotifPopup.fxml", this);
+		preferencesController = manager.newFxml("Preferences.fxml", this);
+		contactPanelController = manager.newFxml("Contacts.fxml", this);
+		
+		
 	}
 	
 	@Override
@@ -216,10 +232,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		webView.setContextMenuEnabled(false);
 		viewEngine.setJavaScriptEnabled(true);
 		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm());
-		
-		
-		// create notification popup
-		notifPopup = new NotifPopup();
+
 	}
 
 	void doSendMessage() {
@@ -288,20 +301,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	
 	@FXML
 	void doOpenPreferences(ActionEvent event) throws Exception {
-		// TODO display preferences window
-		if(preferencesWindow == null) {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("Preferences.fxml"), bundle);
-			loader.setControllerFactory(controllerFactory);
-			Parent preferencesPane = (Parent)loader.load();
-			preferencesController = loader.getController();
-			// load FXML
-			preferencesWindow = new Stage(StageStyle.UTILITY);
-			preferencesWindow.initOwner(window);
-			preferencesWindow.initModality(Modality.WINDOW_MODAL);
-			preferencesWindow.setScene(new Scene(preferencesPane));
-		}
-		preferencesWindow.showAndWait();
-		
+		preferencesController.showWindow(getWindow());
 	}
 	
 	@FXML
@@ -469,7 +469,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		htmlWindow.call("displayMessage", htmlMessage);
 		history.recordMessage(htmlMessage, message.getResourceRefs());
 		
-		notifPopup.show(window, message.getNick(), message.getMessage());
+		notifPopupController.show(window, message.getNick(), message.getMessage());
 		// mainWindow.toFront();
 	}
 	
