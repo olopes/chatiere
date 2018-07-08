@@ -68,37 +68,37 @@ public class HistoryLoggerImpl implements HistoryLogger {
 	private void setupHistoryFile(ConfigService configService) {
 		try {
 			Date now = new Date();
-			Path hist = Paths.get("chatlog");
+			Path hist = Paths.get("chatlog"); //$NON-NLS-1$
 			Files.createDirectories(hist);
-			if(!Files.exists(hist.resolve("ChatView.css"))) {
-				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/ChatView.css"), hist.resolve("ChatView.css"));
+			if(!Files.exists(hist.resolve("ChatView.css"))) { //$NON-NLS-1$
+				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/ChatView.css"), hist.resolve("ChatView.css")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			if(!Files.exists(hist.resolve("OpenSansEmoji.ttf"))) {
-				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/OpenSansEmoji.ttf"), hist.resolve("OpenSansEmoji.ttf"));
+			if(!Files.exists(hist.resolve("OpenSansEmoji.ttf"))) { //$NON-NLS-1$
+				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/OpenSansEmoji.ttf"), hist.resolve("OpenSansEmoji.ttf")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			String histFileName = new SimpleDateFormat("'ChatLog_'yyyyMMdd_HHmmss'.html'").format(now);
-			String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now);
+			String histFileName = new SimpleDateFormat("'ChatLog_'yyyyMMdd_HHmmss'.html'").format(now); //$NON-NLS-1$
+			String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now); //$NON-NLS-1$
 			Path path = hist.resolve(histFileName);
 			BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 			writer = new PrintWriter(bufferedWriter);
-			writer.println("<!DOCTYPE html>\n" + 
-					"<html>\n" + 
-					"<head>\n" + 
-					"<meta charset=\"utf-8\" />\n" + 
-					"<title>ChatteFX - Conversation log "+timestamp+"</title>\n" + 
-					"<style>\n" +
-					"@font-face {\n" + 
-					"    font-family: 'OpenSansEmoji';\n" + 
-					"    src: url('OpenSansEmoji.ttf');\n" + 
-					"}\n" +
-					"</style>\n" + 
-					"<link rel=\"stylesheet\" href=\"ChatView.css\" />\n" + 
-					"</head>\n" + 
-					"<body>\n" + 
-					"<h1>Welcome Grande Chato</h1>\n" + 
-					"<div id=\"msglist\">");
+			writer.println("<!DOCTYPE html>\n" +  //$NON-NLS-1$
+					"<html>\n" +  //$NON-NLS-1$
+					"<head>\n" +  //$NON-NLS-1$
+					"<meta charset=\"utf-8\" />\n" + //$NON-NLS-1$ 
+					"<title>ChatteFX - Conversation log "+timestamp+"</title>\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+					"<style>\n" + //$NON-NLS-1$
+					"@font-face {\n" +  //$NON-NLS-1$
+					"    font-family: 'OpenSansEmoji';\n" + //$NON-NLS-1$ 
+					"    src: url('OpenSansEmoji.ttf');\n" +  //$NON-NLS-1$
+					"}\n" + //$NON-NLS-1$
+					"</style>\n" +  //$NON-NLS-1$
+					"<link rel=\"stylesheet\" href=\"ChatView.css\" />\n" + //$NON-NLS-1$ 
+					"</head>\n" +  //$NON-NLS-1$
+					"<body>\n" +  //$NON-NLS-1$
+					"<h1>Welcome Grande Chato</h1>\n" + //$NON-NLS-1$ 
+					"<div id=\"msglist\">"); //$NON-NLS-1$
 		} catch(Exception e) {
-			throw new RuntimeException("Failed to setup chat history", e);
+			throw new RuntimeException("Failed to setup chat history", e); //$NON-NLS-1$
 		}
 	}
 
@@ -109,7 +109,7 @@ public class HistoryLoggerImpl implements HistoryLogger {
 	
 	
 	private void closeHistoryFile() {
-		writer.println("</div></body></html>");
+		writer.println("</div></body></html>"); //$NON-NLS-1$
 		writer.close();
 	}
 
@@ -120,10 +120,10 @@ public class HistoryLoggerImpl implements HistoryLogger {
 		if(resources != null && !resources.isEmpty()) {
 			for(String resourceCode : resources) {
 				String resourceName = resourceManager.getResourceFile(resourceCode).getName();
-				fixedMessage = fixedMessage.replace("\"chato:"+resourceCode+"\"", "\"../toybox/"+resourceName+"\"");
+				fixedMessage = fixedMessage.replace("\"chato:"+resourceCode+"\"", "\"../toybox/"+resourceName+"\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 		}
-		writer.println("<div>"+fixedMessage+"</div>");
+		writer.println("<div>"+fixedMessage+"</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

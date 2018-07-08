@@ -26,9 +26,9 @@ package chatte.ui.fx;
 
 public enum SoEnv {
 	generic(),
-	windows("cmd.exe", "/c", "START", "%WINDIR%\\system32\\SnippingTool.exe"),
-	kde("spectacle"),
-	gnome("gnome-screenshot", "-i"),
+	windows("cmd.exe", "/c", "START", "%WINDIR%\\system32\\SnippingTool.exe"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	kde("spectacle"), //$NON-NLS-1$
+	gnome("gnome-screenshot", "-i"), //$NON-NLS-1$ //$NON-NLS-2$
 	;
 	final String [] cmd;
 	SoEnv(String ... cmd) {
@@ -40,11 +40,11 @@ public enum SoEnv {
 	}
 	
 	public static SoEnv getEnv() {
-		if(System.getProperty("os.name").startsWith("Windows")) {
+		if(System.getProperty("os.name").startsWith("Windows")) { //$NON-NLS-1$ //$NON-NLS-2$
 			return windows;
-		} else if ("KDE".equals(System.getenv("XDG_CURRENT_DESKTOP"))){
+		} else if ("KDE".equals(System.getenv("XDG_CURRENT_DESKTOP"))){ //$NON-NLS-1$ //$NON-NLS-2$
 			return kde;
-		} else if ("GNOME".equals(System.getenv("XDG_CURRENT_DESKTOP"))){
+		} else if ("GNOME".equals(System.getenv("XDG_CURRENT_DESKTOP"))){ //$NON-NLS-1$ //$NON-NLS-2$
 			return gnome;
 		} else {
 			return generic;

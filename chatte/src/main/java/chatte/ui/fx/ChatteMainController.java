@@ -128,7 +128,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	SoEnv soEnv;
 	int currentColor = 0;
 	
-	private String lastStyle="odd";
+	private String lastStyle="odd"; //$NON-NLS-1$
 	private Friend lastUser=null;
 
 	private Logger log = getLogger();
@@ -196,10 +196,10 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		// create notification popup
 
 		// notifPopup = new NotifPopup();
-		alertController = manager.newFxml("Alert.fxml", this);
-		notifPopupController = manager.newFxml("NotifPopup.fxml", this);
-		preferencesController = manager.newFxml("Preferences.fxml", this);
-		contactPanelController = manager.newFxml("Contacts.fxml", this);
+		alertController = manager.newFxml("Alert.fxml", this); //$NON-NLS-1$
+		notifPopupController = manager.newFxml("NotifPopup.fxml", this); //$NON-NLS-1$
+		preferencesController = manager.newFxml("Preferences.fxml", this); //$NON-NLS-1$
+		contactPanelController = manager.newFxml("Contacts.fxml", this); //$NON-NLS-1$
 		
 		
 	}
@@ -225,30 +225,30 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		WebEngine engine = inputArea.getEngine();
 		inputArea.setContextMenuEnabled(false);
 		engine.setJavaScriptEnabled(true);
-		engine.load(getClass().getResource("InputView.html").toExternalForm());
+		engine.load(getClass().getResource("InputView.html").toExternalForm()); //$NON-NLS-1$
 		
 		// configure conversation area
 		WebEngine viewEngine = webView.getEngine();
 		webView.setContextMenuEnabled(false);
 		viewEngine.setJavaScriptEnabled(true);
-		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm());
+		viewEngine.load(getClass().getResource("ChatView.html").toExternalForm()); //$NON-NLS-1$
 
 	}
 
 	void doSendMessage() {
 		WebEngine engine = inputArea.getEngine();
-		JSObject inputContents = (JSObject) engine.executeScript("getInputContents()");
-		String txtData = (String) inputContents.getMember("text");
+		JSObject inputContents = (JSObject) engine.executeScript("getInputContents()"); //$NON-NLS-1$
+		String txtData = (String) inputContents.getMember("text"); //$NON-NLS-1$
 		log.fine(txtData);
 		
 		Set<String> resources = new HashSet<>();
-		JSObject resourcesObject = (JSObject) inputContents.getMember("resources");
-		int size = ((Number)resourcesObject.getMember("length")).intValue();
+		JSObject resourcesObject = (JSObject) inputContents.getMember("resources"); //$NON-NLS-1$
+		int size = ((Number)resourcesObject.getMember("length")).intValue(); //$NON-NLS-1$
 		for(int i = 0; i < size; i++) {
 			resources.add((String)resourcesObject.getSlot(i));
 		}
-		log.fine("Resources: "+resources);
-		engine.executeScript("document.body.innerHTML=''");
+		log.fine("Resources: "+resources); //$NON-NLS-1$
+		engine.executeScript("document.body.innerHTML=''"); //$NON-NLS-1$
 		this.messageBroker.sendMessage(new TypedMessage(me, txtData, resources));
 	}
 	
@@ -268,14 +268,14 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	
 	@FXML 
 	void doExit(ActionEvent event) {
-		log.fine("Window close request");
+		log.fine("Window close request"); //$NON-NLS-1$
 		ChatteDialog dialog = new ChatteDialog(
 				window,
-				bundle.getString("dialog.close.title"),
-				bundle.getString("dialog.close.message"),
+				bundle.getString("dialog.close.title"), //$NON-NLS-1$
+				bundle.getString("dialog.close.message"), //$NON-NLS-1$
 				new String [] {
-						bundle.getString("dialog.close.cancel"),
-						bundle.getString("dialog.close.exit"),
+						bundle.getString("dialog.close.cancel"), //$NON-NLS-1$
+						bundle.getString("dialog.close.exit"), //$NON-NLS-1$
 				}
 				);
 		int selected = dialog.showDialog();
@@ -321,15 +321,15 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 						@Override
 						public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
 							if (newState == State.SUCCEEDED) {
-								JSObject htmlWindow = (JSObject) pickerView.getEngine().executeScript("window");
-								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteMainController.this));
-								htmlWindow.call("loadResources", (Object)resourceManager.getResources());
+								JSObject htmlWindow = (JSObject) pickerView.getEngine().executeScript("window"); //$NON-NLS-1$
+								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteMainController.this)); //$NON-NLS-1$
+								htmlWindow.call("loadResources", (Object)resourceManager.getResources()); //$NON-NLS-1$
 							}
 						}
 					});
 
 		}
-		pickerView.getEngine().load(getClass().getResource("EmoticonView.html").toExternalForm());
+		pickerView.getEngine().load(getClass().getResource("EmoticonView.html").toExternalForm()); //$NON-NLS-1$
 		pickerStage.show();
 	}
 
@@ -337,8 +337,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	@FXML
 	void doAddImage(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(bundle.getString("dialog.addEmoticon.title"));
-		fileChooser.getExtensionFilters().add(new ExtensionFilter(bundle.getString("dialog.addEmoticon.filter"), resourceManager.getValidFileExtensions()));
+		fileChooser.setTitle(bundle.getString("dialog.addEmoticon.title")); //$NON-NLS-1$
+		fileChooser.getExtensionFilters().add(new ExtensionFilter(bundle.getString("dialog.addEmoticon.filter"), resourceManager.getValidFileExtensions())); //$NON-NLS-1$
 		File selected = fileChooser.showOpenDialog(window);
 		if(selected != null) {
 			String newResource = resourceManager.addResource(selected);
@@ -368,15 +368,15 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
         		}
         		
         		bufferedImage.flush();
-        		File tempFile = File.createTempFile("tmp_", ".png");
-        		ImageIO.write(bufferedImage, "png", tempFile);
+        		File tempFile = File.createTempFile("tmp_", ".png"); //$NON-NLS-1$ //$NON-NLS-2$
+        		ImageIO.write(bufferedImage, "png", tempFile); //$NON-NLS-1$
         		String resource = resourceManager.addResource(tempFile);
         		tempFile.delete();
 
         		appendInputImage(resource);
 
         	} catch(Exception e) {
-        		log.log(Level.SEVERE, "Error copying image from clipboard", e);
+        		log.log(Level.SEVERE, "Error copying image from clipboard", e); //$NON-NLS-1$
         	}
 		}
 		inputArea.requestFocus();
@@ -397,7 +397,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 				try {
 					processBuilder.start();
 				} catch (IOException e) {
-	        		log.log(Level.SEVERE, "Error launching snipping tool", e);
+	        		log.log(Level.SEVERE, "Error launching snipping tool", e); //$NON-NLS-1$
 				}
 			}
 		}).start();
@@ -406,8 +406,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	@FXML
 	void doPanic(ActionEvent event) {
 		WebEngine engine = webView.getEngine();
-		JSObject htmlWindow = (JSObject) engine.executeScript("window");
-		htmlWindow.call("clearScreen");
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("clearScreen"); //$NON-NLS-1$
 		window.setIconified(true);
 		inputArea.requestFocus();
 	}
@@ -420,8 +420,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	
 	public void appendInputImage(String resourceCode) {
 		WebEngine engine = inputArea.getEngine();
-		JSObject htmlWindow = (JSObject) engine.executeScript("window");
-		htmlWindow.call("appendImage", resourceCode);
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("appendImage", resourceCode); //$NON-NLS-1$
 	}
 	
 	public void messageTyped(TypedMessage msg) {
@@ -435,25 +435,25 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		if(lastUser != msg.getFrom()) {
 			newUser = true;
 			lastUser = msg.getFrom();
-			lastStyle = "even".equals(lastStyle)?"odd":"even";
+			lastStyle = "even".equals(lastStyle)?"odd":"even"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div class=\"").append(lastStyle).append("\">");
+		sb.append("<div class=\"").append(lastStyle).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
 		if(newUser) {
 			String friendColor = lastUser.getColor();
-			sb.append("<div class=\"from\" style=\"color:").append(friendColor).append(";\">")
+			sb.append("<div class=\"from\" style=\"color:").append(friendColor).append(";\">") //$NON-NLS-1$ //$NON-NLS-2$
 			.append(msg.getFrom().getNick())
-			.append("</div>");
+			.append("</div>"); //$NON-NLS-1$
 		}
 
-		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
 		sb
-		.append("<div class=\"message\">").append(msg.getMessage()).append(' ')
-		.append("<span class=\"timestamp\">").append(fmt.format(received)).append("</span> ")
+		.append("<div class=\"message\">").append(msg.getMessage()).append(' ') //$NON-NLS-1$
+		.append("<span class=\"timestamp\">").append(fmt.format(received)).append("</span> ") //$NON-NLS-1$ //$NON-NLS-2$
 		
-		.append("</div>")
-		.append("</div>");
+		.append("</div>") //$NON-NLS-1$
+		.append("</div>"); //$NON-NLS-1$
 		// sb.append("<div><img src=\"").append(new File("img/hello.gif").toURI().toURL()).append("\" /></div>");
 
 		return sb.toString();
@@ -465,8 +465,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		
 		String htmlMessage = convertChatMessage(message);
 		
-		JSObject htmlWindow = (JSObject) engine.executeScript("window");
-		htmlWindow.call("displayMessage", htmlMessage);
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("displayMessage", htmlMessage); //$NON-NLS-1$
 		history.recordMessage(htmlMessage, message.getResourceRefs());
 		
 		notifPopupController.show(window, message.getNick(), message.getMessage());
@@ -474,20 +474,20 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	}
 	
 	public void displayStatusMessage(StatusMessage msg) {
-		log.info("Status message received: "+msg);
+		log.info("Status message received: "+msg); //$NON-NLS-1$
 		WebEngine engine = webView.getEngine();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("<div class=\"").append(msg.getStatus()).append("\">");
-		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss");
-		sb.append("<span class=\"timestamp\">").append(fmt.format(new Date())).append("</span> ")
+		sb.append("<div class=\"").append(msg.getStatus()).append("\">"); //$NON-NLS-1$ //$NON-NLS-2$
+		SimpleDateFormat fmt = new SimpleDateFormat("HH:mm:ss"); //$NON-NLS-1$
+		sb.append("<span class=\"timestamp\">").append(fmt.format(new Date())).append("</span> ") //$NON-NLS-1$ //$NON-NLS-2$
 		.append(msg.getFrom())
-		.append(" &lt;").append(msg.getStatus()).append("&gt;</div>");
+		.append(" &lt;").append(msg.getStatus()).append("&gt;</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String htmlMessage = sb.toString();
 		
-		JSObject htmlWindow = (JSObject) engine.executeScript("window");
-		htmlWindow.call("displayMessage", htmlMessage);
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("displayMessage", htmlMessage); //$NON-NLS-1$
 		history.recordMessage(htmlMessage, null);
 		window.toFront();
 	}

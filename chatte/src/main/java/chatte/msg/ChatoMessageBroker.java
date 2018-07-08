@@ -61,11 +61,11 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 
 		void call(AbstractMessage message) {
 			try {
-				log.fine("Calling...");
+				log.fine("Calling..."); //$NON-NLS-1$
 				this.method.invoke(this.instance, message);
-				log.fine("done!");
+				log.fine("done!"); //$NON-NLS-1$
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "method call failed with exception", e);
+				log.log(Level.SEVERE, "method call failed with exception", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -96,24 +96,24 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 
 		Class<?> listenClass = listenerInstance.getClass();
 
-		log.info("Registering new listener of type "+listenClass.getSimpleName());
+		log.info("Registering new listener of type "+listenClass.getSimpleName()); //$NON-NLS-1$
 		
 		for(Method method : listenClass.getMethods()) {
-			log.fine("   checking method "+method.getName());
+			log.fine("   checking method "+method.getName()); //$NON-NLS-1$
 			MessageListener listenerAnnotation = method.getAnnotation(MessageListener.class);
 			if(listenerAnnotation == null) continue;
-			log.fine("      Annotation found!");
+			log.fine("      Annotation found!"); //$NON-NLS-1$
 			Class<? extends AbstractMessage> messageType = listenerAnnotation.forMessage();
-			log.fine("      Message type is "+messageType.getSimpleName());
+			log.fine("      Message type is "+messageType.getSimpleName()); //$NON-NLS-1$
 			if(messageType == AbstractMessage.class) {
-				log.fine("          AbstractMessage or default value. Inspecting method params...");
+				log.fine("          AbstractMessage or default value. Inspecting method params..."); //$NON-NLS-1$
 				// default value - check parameters
 				Class<?> [] paramTypes = method.getParameterTypes();
 				if(paramTypes.length == 1 && AbstractMessage.class.isAssignableFrom(paramTypes[0])) {
 					@SuppressWarnings("unchecked")
 					Class<? extends AbstractMessage> paramType = (Class<? extends AbstractMessage>) paramTypes[0];
 					messageType = paramType;
-					log.fine("          one parameter of type "+paramType.getSimpleName());
+					log.fine("          one parameter of type "+paramType.getSimpleName()); //$NON-NLS-1$
 				}
 			}
 			if(messageType != AbstractMessage.class) {
@@ -122,7 +122,7 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 				if(typeListeners == null)
 					listeners.put(messageType, typeListeners = new LinkedList<>());
 				typeListeners.add(new Listener(listenerInstance, method));
-				log.info("   listener method registered");
+				log.info("   listener method registered"); //$NON-NLS-1$
 			}
 		}
 	}
@@ -159,25 +159,25 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 		if (message == null)
 			return;
 
-		log.fine("doSend message "+message.getClass().getSimpleName());
+		log.fine("doSend message "+message.getClass().getSimpleName()); //$NON-NLS-1$
 		// Check if all resources are available
 		Set<String> missingResources = missingRessources(message);
 		boolean messageComplete = missingResources.isEmpty();
 		message.setComplete(messageComplete);
 		
 		if(messageComplete) {
-			log.fine("Message complete");
+			log.fine("Message complete"); //$NON-NLS-1$
 			Class<? extends AbstractMessage> messageClass = message.getClass();
 			List<Listener> typeListeners = listeners.get(messageClass);
-			log.fine("Listeners for this message type: "+typeListeners);
+			log.fine("Listeners for this message type: "+typeListeners); //$NON-NLS-1$
 			if(typeListeners != null && !typeListeners.isEmpty()) {
 				for (Listener listener : typeListeners) {
-					log.fine("Dispatching message to listener...");
+					log.fine("Dispatching message to listener..."); //$NON-NLS-1$
 					listener.call(message);
 				}
 			}
 		} else {
-			log.fine("Incomplete message. Move it to pending messages");
+			log.fine("Incomplete message. Move it to pending messages"); //$NON-NLS-1$
 			if(!message.isResourcesRequested()) {
 				// Move the request to the front
 				messageQueue.addFirst(new ResourceRequestMessage(message.getFrom(), missingResources));
@@ -190,7 +190,7 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 	Set<String> missingRessources(AbstractMessage message) {
 		Set<String> missingResources = new HashSet<>();
 		if(message.getResourceRefs() != null && !message.getResourceRefs().isEmpty()) {
-			log.fine("Checking message with resources. "+message.getResourceRefs());
+			log.fine("Checking message with resources. "+message.getResourceRefs()); //$NON-NLS-1$
 			for(String resource : message.getResourceRefs()) {
 				boolean found = resourceManager.resourceExist(resource);
 				if(!found) {
@@ -203,7 +203,7 @@ public class ChatoMessageBroker implements MessageBroker, Runnable {
 	
 	@MessageListener
 	public void resourceUpdated(ResourceUpdatedMessage message) {
-		log.fine("The resource "+message.getResourceCode()+" was updated");
+		log.fine("The resource "+message.getResourceCode()+" was updated"); //$NON-NLS-1$ //$NON-NLS-2$
 		while(!pendingMessages.isEmpty())
 			messageQueue.addLast(pendingMessages.pop());
 	}

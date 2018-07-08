@@ -92,9 +92,9 @@ public class MsgListener implements Runnable {
 		this.connectingFriends = new LinkedList<>();
 		this.localAddresses = new HashSet<>();
 		loadLocalAddresses();
-		this.connectorThread = new Thread(new FriendConnector(), "Friend Connector");
+		this.connectorThread = new Thread(new FriendConnector(), "Friend Connector"); //$NON-NLS-1$
 		this.connectorThread.start();
-		this.listenerThread = new Thread(this, "Connection Listener");
+		this.listenerThread = new Thread(this, "Connection Listener"); //$NON-NLS-1$
 		this.listenerThread.start();
 	}
 	
@@ -126,13 +126,13 @@ public class MsgListener implements Runnable {
 				}
 			}
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Error loading local addresses list", ex);
+			log.log(Level.SEVERE, "Error loading local addresses list", ex); //$NON-NLS-1$
 		}
 	}
 	
 	
 	void printNetAddresses () {
-		log.info("Local addresses: "+this.localAddresses);
+		log.info("Local addresses: "+this.localAddresses); //$NON-NLS-1$
 	}
 	
 	@Override
@@ -155,17 +155,17 @@ public class MsgListener implements Runnable {
 					Socket socket = server.accept();
 					String host = socket.getInetAddress().getHostAddress();
 					
-					log.info("Got a connection from "+host);
+					log.info("Got a connection from "+host); //$NON-NLS-1$
 					Friend friend = configService.getFriend(host);
 
 					connectedFriends.add(friend);
 					
 					MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
-					new Thread(newWorker,"net client "+host).start();
+					new Thread(newWorker,"net client "+host).start(); //$NON-NLS-1$
 				} catch(SocketTimeoutException ex) {
-					log.finest("socket timeout; continuing");
+					log.finest("socket timeout; continuing"); //$NON-NLS-1$
 				} catch(IOException ex) {
-					log.log(Level.SEVERE, "Connection error", ex);
+					log.log(Level.SEVERE, "Connection error", ex); //$NON-NLS-1$
 				}
 			}
 			
@@ -182,34 +182,34 @@ public class MsgListener implements Runnable {
 	
 	@MessageListener
 	public void shutdown(StopServicesMessage message) {
-		log.fine("Stop service request");
+		log.fine("Stop service request"); //$NON-NLS-1$
 		sendStop();
 	}
 	
 	@MessageListener
 	public void connectNewFriend(NewFriendMessage message) {
-		log.fine("New friend added "+message.getFriend().getHost());
+		log.fine("New friend added "+message.getFriend().getHost()); //$NON-NLS-1$
 		connectToFriend(message.getFriend());
 	}
 	
 	@MessageListener
 	public void welcomeFriend(WelcomeMessage message) {
-		log.fine("Hello new friend!");
+		log.fine("Hello new friend!"); //$NON-NLS-1$
 		Friend friend = configService.getFriend(message.getFrom().getHost());
 		friend.setPort(message.getPort());
 		friend.setNick(message.getNick());
 		configService.addFriend(friend);
 		friend.setConnected(true);
-		log.fine("We are now connected: "+friend);
+		log.fine("We are now connected: "+friend); //$NON-NLS-1$
 		messageBroker.sendMessage(new ConnectedMessage(friend));
 		if(message.getKnownFriends() != null && !message.getKnownFriends().isEmpty()) {
 			for(Friend newFriend : message.getKnownFriends()) {
 				if(newFriend instanceof MySelf) {
-					log.fine("WELCOME FRIENDS - Skipping my self...");
+					log.fine("WELCOME FRIENDS - Skipping my self..."); //$NON-NLS-1$
 					continue;
 				}
 				if(this.localAddresses.contains(newFriend.getHost())) {
-					log.fine("WELCOME FRIENDS - Skipping my onw machine...");
+					log.fine("WELCOME FRIENDS - Skipping my onw machine..."); //$NON-NLS-1$
 					continue;
 				}
 				configService.addFriend(newFriend);
@@ -229,13 +229,13 @@ public class MsgListener implements Runnable {
 	
 	void connectToFriend(Friend friend) {
 		if(null == friend || friend instanceof MySelf || localAddresses.contains(friend.getHost())) {
-			log.fine("Ignoring local connection");
+			log.fine("Ignoring local connection"); //$NON-NLS-1$
 			return;
 		}
-		log.info("Connection to "+friend.getHost()+"...");
+		log.info("Connection to "+friend.getHost()+"..."); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		if(connectedFriends.contains(friend)) {
-			log.fine("My friend, you are already connected/connecting: "+friend);
+			log.fine("My friend, you are already connected/connecting: "+friend); //$NON-NLS-1$
 			return;
 		}
 		
@@ -245,11 +245,11 @@ public class MsgListener implements Runnable {
 			Socket socket = SSLSocketFactory.getDefault().createSocket();
 			socket.connect(InetSocketAddress.createUnresolved(friend.getHost(), friend.getPort()), 10000);
 			MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
-			Thread workerThread = new Thread(newWorker,"net client "+socket.getInetAddress());
+			Thread workerThread = new Thread(newWorker,"net client "+socket.getInetAddress()); //$NON-NLS-1$
 			workerThread.start();
 		} catch(IOException e) {
 			friend.setConnected(false);
-			log.log(Level.SEVERE, "Connection to "+friend.getHost()+" failed", e);
+			log.log(Level.SEVERE, "Connection to "+friend.getHost()+" failed", e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 	}

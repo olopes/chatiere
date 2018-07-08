@@ -80,20 +80,20 @@ public class ChatteFX extends Application {
 	public static void main(String [] args) {
 		
 		// Configure logging
-		if(!System.getProperties().containsKey("java.util.logging.config.file")) {
-			if(new java.io.File("logging.properties").exists()) {
-				System.setProperty("java.util.logging.config.file","logging.properties");
+		if(!System.getProperties().containsKey("java.util.logging.config.file")) { //$NON-NLS-1$
+			if(new java.io.File("logging.properties").exists()) { //$NON-NLS-1$
+				System.setProperty("java.util.logging.config.file","logging.properties"); //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
-				new java.io.File("logs").mkdirs();
+				new java.io.File("logs").mkdirs(); //$NON-NLS-1$
 				try {
-					LogManager.getLogManager().readConfiguration(ChatteFX.class.getResourceAsStream("/logging.properties"));
+					LogManager.getLogManager().readConfiguration(ChatteFX.class.getResourceAsStream("/logging.properties")); //$NON-NLS-1$
 				} catch (SecurityException | IOException e) {
-					System.err.println("Error during java logging configuration");
+					System.err.println("Error during java logging configuration"); //$NON-NLS-1$
 					e.printStackTrace();
 				}
 			}
 		}
-		Logger.getLogger("chatte.ui.fx.ChatteFX").severe("Starting ChatteFX");
+		Logger.getLogger("chatte.ui.fx.ChatteFX").severe("Starting ChatteFX"); //$NON-NLS-1$ //$NON-NLS-2$
 		launch(ChatteFX.class, args);
 	}
 
@@ -103,7 +103,7 @@ public class ChatteFX extends Application {
 
 		// Application.Parameters parameters = getParameters();
 
-		resourceBundle = ResourceBundle.getBundle("chatte.ui.fx.Bundle"); 
+		resourceBundle = ResourceBundle.getBundle("chatte.ui.fx.Bundle");  //$NON-NLS-1$
 
 		configService = new ConfigServiceImpl();
 		resourceManager = new ChatoResourceManager();
@@ -120,19 +120,19 @@ public class ChatteFX extends Application {
 		controllerFactory = new ControllerFactory(configService, resourceManager, messageBroker);
 		
 		// register "custom" font
-		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12);
+		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12); //$NON-NLS-1$
 	}
 
     private boolean setStorePassword(final String password) {
-    	passwordSet = isGoodPassword("ssl.key", password);
+    	passwordSet = isGoodPassword("ssl.key", password); //$NON-NLS-1$
 		// Configure SSL context
-		System.setProperty("javax.net.ssl.keyStore","ssl.key");
+		System.setProperty("javax.net.ssl.keyStore","ssl.key"); //$NON-NLS-1$ //$NON-NLS-2$
 		// System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.keyStorePassword",password);
-		System.setProperty("javax.net.ssl.trustStore","ssl.key");
+		System.setProperty("javax.net.ssl.keyStorePassword",password); //$NON-NLS-1$
+		System.setProperty("javax.net.ssl.trustStore","ssl.key"); //$NON-NLS-1$ //$NON-NLS-2$
 		// System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.trustStorePassword",password);
-        log.info("Key configured!");
+		System.setProperty("javax.net.ssl.trustStorePassword",password); //$NON-NLS-1$
+        log.info("Key configured!"); //$NON-NLS-1$
         return passwordSet;
     }
 
@@ -141,10 +141,10 @@ public class ChatteFX extends Application {
 		try (FileInputStream in = new FileInputStream(storeFile)){
 			KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
 			store.load(in, password.toCharArray());
-			log.info("KeyStore successfuly loaded");
+			log.info("KeyStore successfuly loaded"); //$NON-NLS-1$
 			return true;
 		} catch(Exception e) {
-			log.info("Bad password");
+			log.info("Bad password"); //$NON-NLS-1$
 		}
 		// TODO Auto-generated method stub
 		return false;
@@ -153,7 +153,7 @@ public class ChatteFX extends Application {
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resourceBundle);
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatteFX.fxml"), resourceBundle); //$NON-NLS-1$
 		loader.setControllerFactory(controllerFactory);
 		Parent root = (Parent)loader.load();
 		ChatteMainController controller = loader.getController();
@@ -168,14 +168,14 @@ public class ChatteFX extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
-				log.fine("Window close request");
+				log.fine("Window close request"); //$NON-NLS-1$
 				ChatteDialog dialog = new ChatteDialog(
 						primaryStage,
-						resourceBundle.getString("dialog.close.title"),
-						resourceBundle.getString("dialog.close.message"),
+						resourceBundle.getString("dialog.close.title"), //$NON-NLS-1$
+						resourceBundle.getString("dialog.close.message"), //$NON-NLS-1$
 						new String [] {
-								resourceBundle.getString("dialog.close.cancel"),
-								resourceBundle.getString("dialog.close.exit"),
+								resourceBundle.getString("dialog.close.cancel"), //$NON-NLS-1$
+								resourceBundle.getString("dialog.close.exit"), //$NON-NLS-1$
 						}
 						);
 				int selected = dialog.showDialog();
@@ -185,8 +185,8 @@ public class ChatteFX extends Application {
 				}
 			}
 		});
-		primaryStage.setTitle("ChatteFX");
-		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon/cat-upsidedown-icon.png")));
+		primaryStage.setTitle("ChatteFX"); //$NON-NLS-1$
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon/cat-upsidedown-icon.png"))); //$NON-NLS-1$
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
@@ -209,7 +209,7 @@ public class ChatteFX extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		log.info("Stopping stuff");
+		log.info("Stopping stuff"); //$NON-NLS-1$
 		messageBroker.sendMessage(new StopServicesMessage());
 		super.stop();
 	}
@@ -219,12 +219,12 @@ public class ChatteFX extends Application {
         vbox.setPadding(new Insets(10.0));
  
         final Label loginLabel = new Label();
-        loginLabel.setText(resourceBundle.getString("dialog.login.storeKey"));
+        loginLabel.setText(resourceBundle.getString("dialog.login.storeKey")); //$NON-NLS-1$
         
         final PasswordField passwordBox = new PasswordField();
-        passwordBox.setPromptText(resourceBundle.getString("dialog.login.password"));
+        passwordBox.setPromptText(resourceBundle.getString("dialog.login.password")); //$NON-NLS-1$
         
-        final Button button = new Button(resourceBundle.getString("dialog.login.btn"));
+        final Button button = new Button(resourceBundle.getString("dialog.login.btn")); //$NON-NLS-1$
         button.setDefaultButton(true);
         button.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent t) {
@@ -236,11 +236,11 @@ public class ChatteFX extends Application {
                 
                 if(setStorePassword(password)) {
                 	new chatte.net.MsgListener(messageBroker, configService);
-                	log.info("Good password :-)");
+                	log.info("Good password :-)"); //$NON-NLS-1$
                     // Hide if app is ready
                     stage.close();
                 } else {
-                	log.log(Level.SEVERE, "BAD PASSWORD!");
+                	log.log(Level.SEVERE, "BAD PASSWORD!"); //$NON-NLS-1$
                 	// enable edits and show 
                     passwordBox.setEditable(true);
                     button.setDisable(false);

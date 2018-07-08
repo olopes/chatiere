@@ -76,7 +76,7 @@ public class FriendListCell extends ListCell<Friend> {
 			getTooltip().setText(null);
 		} else {
 			textProperty().bind(item.nickProperty());
-			getTooltip().textProperty().bind(Bindings.concat(item.nickProperty(), "@", item.getHost()));
+			getTooltip().textProperty().bind(Bindings.concat(item.nickProperty(), "@", item.getHost())); //$NON-NLS-1$
 			final ReadOnlyBooleanProperty connectedProp = item.connectedProperty();
 			graphicProperty().bind(Bindings.createObjectBinding(new Callable<Node>() {
 				@Override

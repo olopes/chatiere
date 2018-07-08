@@ -32,33 +32,33 @@ public class TestMarshal {
 	
 	public static void main(String[] args) throws Exception {
 		Friend me = new Friend();
-		me.setHost("localhost");
+		me.setHost("localhost"); //$NON-NLS-1$
 		me.setPort(1234);
-		me.setNick("Me self");
+		me.setNick("Me self"); //$NON-NLS-1$
 		Friend other = new Friend();
-		me.setHost("otherhost");
+		me.setHost("otherhost"); //$NON-NLS-1$
 		me.setPort(4321);
-		me.setNick("Otter");
+		me.setNick("Otter"); //$NON-NLS-1$
 		
 		ChatMessage message = new ChatMessage();
 		message.setFrom(me);
-		message.setMessage("Hi there!<br/>How are you?");
+		message.setMessage("Hi there!<br/>How are you?"); //$NON-NLS-1$
 		message.setComplete(true);
-		message.setNick("Maria");
+		message.setNick("Maria"); //$NON-NLS-1$
 		message.setRemote(false);
 		message.setResourceRefs(new HashSet<String>());
 
 		WelcomeMessage welcome = new WelcomeMessage();
 		welcome.setFrom(me);
 		welcome.setKnownFriends(Arrays.asList(other));
-		welcome.setNick("Xico");
+		welcome.setNick("Xico"); //$NON-NLS-1$
 		welcome.setPort(1029);
 		
-		System.out.println("Serialize chat message");
+		System.out.println("Serialize chat message"); //$NON-NLS-1$
 		String msgStr = marshalingExample(message);
 		System.out.println(msgStr);
 		
-		System.out.println("Serialize welcome message");
+		System.out.println("Serialize welcome message"); //$NON-NLS-1$
 		String wlcStr = marshalingExample(welcome);
 		System.out.println(wlcStr);
 

@@ -53,13 +53,13 @@ public class ChatoResourceManager implements ResourceManager {
 	}
 
 	public ChatoResourceManager() {
-		resourceFolder = new File("toybox");
+		resourceFolder = new File("toybox"); //$NON-NLS-1$
 		resourceFolder.mkdirs();
 	}
 
 	public File getResourceFile(String resourceCode) {
 		if(resourceCode == null) return null;
-		final String filePrefix = resourceCode.replaceFirst("chato:", "")+".";
+		final String filePrefix = resourceCode.replaceFirst("chato:", "")+"."; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		File [] flist = resourceFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -90,7 +90,7 @@ public class ChatoResourceManager implements ResourceManager {
 		for(int i = 0; i < resources.length; i++) {
 			resources[i] = files[i].getName();
 			if(files[i].isFile())
-				resources[i] = resources[i].replaceFirst("\\.\\w+$", "");
+				resources[i] = resources[i].replaceFirst("\\.\\w+$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return resources;
 	}
@@ -101,11 +101,13 @@ public class ChatoResourceManager implements ResourceManager {
 			public boolean accept(File pathname) {
 				// accept only files of type gif, jpg and png
 				String name = pathname.getName().toLowerCase();
+				
+				// TODO: I need to do something about this. Like pluggable types via plugins?
 				return pathname.isFile() && 
 						name.length() == 44  /* SHA1+extension */ && (
-						name.endsWith(".gif") ||
-						name.endsWith(".png") ||
-						name.endsWith(".jpg") );
+						name.endsWith(".gif") || //$NON-NLS-1$
+						name.endsWith(".png") || //$NON-NLS-1$
+						name.endsWith(".jpg") ); //$NON-NLS-1$
 			}
 		}));
 	}
@@ -113,7 +115,7 @@ public class ChatoResourceManager implements ResourceManager {
 	public String addResource(File toAdd) {
 		try {
 			// compute sha1sum
-			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+			MessageDigest crypt = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
 			crypt.reset();
 			byte[] b = new byte[8192];
 			int r = 0;
@@ -131,7 +133,7 @@ public class ChatoResourceManager implements ResourceManager {
 			Files.copy(toAdd.toPath(), dest.toPath());
 			return sha1;
 		} catch(Exception e) {
-			log.log(Level.SEVERE, "Error adding new resource", e);
+			log.log(Level.SEVERE, "Error adding new resource", e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -140,7 +142,7 @@ public class ChatoResourceManager implements ResourceManager {
 	String byteToHex(final byte[] hash) {
 		Formatter formatter = new Formatter();
 		for (byte b : hash) {
-			formatter.format("%02x", b);
+			formatter.format("%02x", b); //$NON-NLS-1$
 		}
 		String result = formatter.toString();
 		formatter.close();
@@ -153,11 +155,11 @@ public class ChatoResourceManager implements ResourceManager {
 		if(img instanceof RenderedImage) {
 			File f = null;
 			try {
-				f = File.createTempFile("chato-", ".jpg");
-				ImageIO.write((RenderedImage)img, "jpg", f);
+				f = File.createTempFile("chato-", ".jpg"); //$NON-NLS-1$ //$NON-NLS-2$
+				ImageIO.write((RenderedImage)img, "jpg", f); //$NON-NLS-1$
 				resource = addResource(f);
 			} catch (IOException e) {
-				log.log(Level.SEVERE, "Error saving new image", e);
+				log.log(Level.SEVERE, "Error saving new image", e); //$NON-NLS-1$
 			} finally {
 				if(f != null) f.delete();
 			}
@@ -169,14 +171,14 @@ public class ChatoResourceManager implements ResourceManager {
 		File f = null;
 		String resource = null;
 		try {
-			f = File.createTempFile("recv-", "."+type);
+			f = File.createTempFile("recv-", "."+type); //$NON-NLS-1$ //$NON-NLS-2$
 			try (FileOutputStream ff = new FileOutputStream(f)) {
 				ff.write(data);
 			}
 
 			resource = addResource(f);
 		} catch (IOException e) {
-			log.log(Level.SEVERE, "Error saving received resource", e);
+			log.log(Level.SEVERE, "Error saving received resource", e); //$NON-NLS-1$
 		} finally {
 			if(f!=null) f.delete();
 		}
@@ -195,14 +197,18 @@ public class ChatoResourceManager implements ResourceManager {
 			while((r = in.read(b)) >= 0)
 				out.write(b, 0, r);
 		} catch (IOException e) {
-			log.log(Level.SEVERE, "Error reading resource data", e);
+			log.log(Level.SEVERE, "Error reading resource data", e); //$NON-NLS-1$
 		}
 		return out.toByteArray();
 	}
 	
 	@Override
 	public String[] getValidFileExtensions() {
-		return new String [] {"*.gif","*.jpg","*.png",};
+		return new String [] {
+				"*.gif", //$NON-NLS-1$
+				"*.jpg", //$NON-NLS-1$
+				"*.png", //$NON-NLS-1$
+				};
 	}
 	
 }
