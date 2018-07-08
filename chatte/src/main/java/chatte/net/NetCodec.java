@@ -66,14 +66,14 @@ public class NetCodec {
 		try {
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			// force UTF-8
-			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8"); //$NON-NLS-1$
 			// jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			jaxbMarshaller.marshal(message, output);
 			return output.toByteArray();
 		} catch(Exception e) {
-			log.log(Level.SEVERE, "Something bad happened", e);
+			log.log(Level.SEVERE, "Something bad happened", e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -83,13 +83,13 @@ public class NetCodec {
 		try {
 			Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
 			// force UTF-8
-			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8"); //$NON-NLS-1$
 			// jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 			ByteArrayInputStream input = new ByteArrayInputStream(contents);
 			message = (AbstractMessage)jaxbMarshaller.unmarshal(input);
 		} catch(Exception e) {
-			log.log(Level.SEVERE, "Something bad happened", e);
+			log.log(Level.SEVERE, "Something bad happened", e); //$NON-NLS-1$
 		}
 		return message;
 	}

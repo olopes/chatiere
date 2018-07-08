@@ -41,32 +41,32 @@ public class SampleChattePlugin implements ChattePlugin {
 
 	@Override
 	public String getName() {
-		return "Sample plugin";
+		return "Sample plugin"; //$NON-NLS-1$
 	}
 
 	@Override
 	public String getDescription() {
-		return "Sample plugin description";
+		return "Sample plugin description"; //$NON-NLS-1$
 	}
 	
 	@MessageListener
 	public void welcomeFriend(WelcomeMessage message) {
-		log.info("Hello '"+message.getFrom().getNick()+"'! How are you today?");
+		log.info("Hello '"+message.getFrom().getNick()+"'! How are you today?"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@MessageListener
 	public void byebyeFriend(final DisconnectedMessage message) {
-		log.info("Bye bye '"+message.getFrom().getNick()+"'. I hope to meet you again.");
+		log.info("Bye bye '"+message.getFrom().getNick()+"'. I hope to meet you again."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	@MessageListener
 	public void messageReceived(final ChatMessage message) {
-		log.info("'"+message.getFrom().getNick()+"' said: "+message.getMessage());
+		log.info("'"+message.getFrom().getNick()+"' said: "+message.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@MessageListener
 	public void messageTyped(final TypedMessage message) {
-		log.info("I say: "+message.getMessage());
+		log.info("I say: "+message.getMessage()); //$NON-NLS-1$
 	}
 
 }

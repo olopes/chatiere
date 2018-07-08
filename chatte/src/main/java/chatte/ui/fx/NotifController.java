@@ -24,18 +24,19 @@
  */
 package chatte.ui.fx;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
+import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class NotifController extends BaseChatteController {
 
+	@FXML Parent notifPanel;
+	
 	NotifPopup window;
 	
 	public NotifController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
@@ -43,12 +44,9 @@ public class NotifController extends BaseChatteController {
 	}
 
 	@Override
-	public void initialize(URL baseUrl, ResourceBundle bundle) {
-		window = new NotifPopup();
-	}
-
-	@Override
-	public Window createWindow(Window parent) {
+	public synchronized Window createWindow(Window parent) {
+		if(window == null)
+			window = new NotifPopup(notifPanel);
 		return window;
 	}
 
@@ -58,10 +56,16 @@ public class NotifController extends BaseChatteController {
 
 	@Override
 	public Parent getRoot() {
-		return null;
+		return notifPanel;
 	}
 	
 	@Override
 	public void showWindow(Window owner) {
 	}
+	
+	@FXML
+	public void notifClicked(MouseEvent evt) {
+		window.hide();
+	}
+
 }

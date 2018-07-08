@@ -61,21 +61,21 @@ public class ConfigServiceImpl implements ConfigService {
 	}
 
 	void loadConfig() {
-		File cfgFile = new File("config.xml");
+		File cfgFile = new File("config.xml"); //$NON-NLS-1$
 		if(cfgFile.exists()) {
 			try (XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(cfgFile)))) {
 				@SuppressWarnings("unchecked")
 				Map<String, Friend> readObject = (Map<String, Friend>) decoder.readObject();
 				knownFriends = readObject;
 			} catch (Exception e) {
-				log.log(Level.SEVERE, "Error reading config.xml", e);
+				log.log(Level.SEVERE, "Error reading config.xml", e); //$NON-NLS-1$
 				// TODO handle this....
 			}
 			me = (MySelf) knownFriends.get(me.getHost());
 			
 		} else {
 			me = new MySelf();
-			me.setNick(System.getProperty("user.name", "me"));
+			me.setNick(System.getProperty("user.name", "me")); //$NON-NLS-1$ //$NON-NLS-2$
 			me.setPort(DEFAULT_PORT);
 			knownFriends = new LinkedHashMap<>();
 			knownFriends.put(me.getHost(), me);
@@ -84,12 +84,12 @@ public class ConfigServiceImpl implements ConfigService {
 	}
 
 	void saveConfig() {
-		File cfgFile = new File("config.xml");
+		File cfgFile = new File("config.xml"); //$NON-NLS-1$
 		if(cfgFile.exists()) cfgFile.delete();
 		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(cfgFile)))) {
 			encoder.writeObject(knownFriends);
 		} catch (Exception ex) {
-			log.log(Level.SEVERE, "Error saving config.xml", ex);
+			log.log(Level.SEVERE, "Error saving config.xml", ex); //$NON-NLS-1$
 		}
 	}
 
@@ -132,7 +132,7 @@ public class ConfigServiceImpl implements ConfigService {
 	public void addFriend(Friend friend) {
 		if(null == friend) return;
 		String host = fixHost(friend.getHost());
-		log.info("Registering new friend with host "+host);
+		log.info("Registering new friend with host "+host); //$NON-NLS-1$
 		if(me.getHost().equals(host)) {
 			me.setNick(friend.getNick());
 			me.setPort(friend.getPort());
@@ -153,7 +153,7 @@ public class ConfigServiceImpl implements ConfigService {
 		try {
 			return InetAddress.getByName(host).getHostAddress();
 		} catch (UnknownHostException e) {
-			log.log(Level.WARNING, "Host not found: "+host, e);
+			log.log(Level.WARNING, "Host not found: "+host, e); //$NON-NLS-1$
 			return null;
 		}
 

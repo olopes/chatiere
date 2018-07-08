@@ -36,9 +36,9 @@ public class Chatte {
 	static boolean hasJfxrt(URLClassLoader cl) {
 		for(URL entry : cl.getURLs()) {
 			File f = new File(entry.getFile());
-			System.out.println("   => "+f.getName());
-			if(f.exists() && f.isFile() && "jfxrt.jar".equals(f.getName())) {
-				System.out.println("Found it!! Nothing to be done.");
+			System.out.println("   => "+f.getName()); //$NON-NLS-1$
+			if(f.exists() && f.isFile() && "jfxrt.jar".equals(f.getName())) { //$NON-NLS-1$
+				System.out.println("Found it!! Nothing to be done."); //$NON-NLS-1$
 				return true;
 			}
 		}
@@ -49,7 +49,7 @@ public class Chatte {
 		@Override
 		public boolean accept(File pathname) {
 			String lowerName = pathname.getName().toLowerCase();
-			return pathname.isDirectory() || lowerName.endsWith(".jar") || lowerName.endsWith(".zip");
+			return pathname.isDirectory() || lowerName.endsWith(".jar") || lowerName.endsWith(".zip"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -59,14 +59,14 @@ public class Chatte {
 		 */
 		ClassLoader cl = Chatte.class.getClassLoader();
 		if(cl instanceof URLClassLoader) {
-			System.out.println("Launcher is URLClassLoader!");
+			System.out.println("Launcher is URLClassLoader!"); //$NON-NLS-1$
 			URL [] oldClassPath = ((URLClassLoader)cl).getURLs();
 			System.out.println(Arrays.asList(oldClassPath));
-			Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class); //$NON-NLS-1$
 			addURL.setAccessible(true);
 
 			// append "ext" folder contents
-			File ext = new File("ext");
+			File ext = new File("ext"); //$NON-NLS-1$
 			if(ext.exists() && ext.isDirectory()) {
 				for(File dependency : ext.listFiles(new ClasspathFileFilter())) {
 					addURL.invoke(cl, dependency.toURI().toURL());
@@ -77,31 +77,31 @@ public class Chatte {
 			boolean jfxrtFound = hasJfxrt((URLClassLoader)cl);
 			if(!jfxrtFound) {
 				// java8 will add jfxrt.jar to ext classpath
-				System.out.println("Checking ext classpath...");
+				System.out.println("Checking ext classpath..."); //$NON-NLS-1$
 				jfxrtFound = hasJfxrt((URLClassLoader)cl.getParent());
 			}
 			
 			if(!jfxrtFound) {
-				System.out.println("jfxrt.jar not in classpath. hacking... :-(");
+				System.out.println("jfxrt.jar not in classpath. hacking... :-("); //$NON-NLS-1$
 				// find jfxrt location
-				String javaHomePath = System.getProperty("java.home");
+				String javaHomePath = System.getProperty("java.home"); //$NON-NLS-1$
 				File javaHome = new File(javaHomePath);
-				File jfxrt = new File(new File(javaHome, "lib"), "jfxrt.jar");
-				System.out.println("jfxrt.jar location: "+jfxrt);
+				File jfxrt = new File(new File(javaHome, "lib"), "jfxrt.jar"); //$NON-NLS-1$ //$NON-NLS-2$
+				System.out.println("jfxrt.jar location: "+jfxrt); //$NON-NLS-1$
 
 				addURL.invoke(cl, jfxrt.toURI().toURL());
 				URL [] newClassPath = ((URLClassLoader)cl).getURLs();
-				System.out.println("Fixed classpath:");
+				System.out.println("Fixed classpath:"); //$NON-NLS-1$
 				System.out.println(Arrays.asList(newClassPath));
 
-				cl.loadClass("javafx.application.Application");
+				cl.loadClass("javafx.application.Application"); //$NON-NLS-1$
 			}
 		}
 		
-		System.out.println("Loading ChatteFX class");
-		Class<?> cc = cl.loadClass("chatte.ui.fx.ChatteFX");
-		Method main = cc.getDeclaredMethod("main", String[].class);
-		System.out.println("Starting ChatteFX");
+		System.out.println("Loading ChatteFX class"); //$NON-NLS-1$
+		Class<?> cc = cl.loadClass("chatte.ui.fx.ChatteFX"); //$NON-NLS-1$
+		Method main = cc.getDeclaredMethod("main", String[].class); //$NON-NLS-1$
+		System.out.println("Starting ChatteFX"); //$NON-NLS-1$
 		main.invoke(null, (Object)args);
 
 	}

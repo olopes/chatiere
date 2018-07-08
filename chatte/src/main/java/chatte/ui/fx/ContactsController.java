@@ -51,7 +51,7 @@ public class ContactsController extends BaseChatteController {
 
 	@FXML 
 	void doConnect(ActionEvent event) {
-		log.fine("Window close request");
+		log.fine("Window close request"); //$NON-NLS-1$
 		Friend friend = new Friend();
 		friend.setNick(nick.getText());
 		friend.setHost(host.getText());

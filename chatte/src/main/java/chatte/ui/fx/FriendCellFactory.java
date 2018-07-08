@@ -41,7 +41,7 @@ public class FriendCellFactory implements Callback<ListView<Friend>, ListCell<Fr
 	public ListCell<Friend> call(ListView<Friend> param) {
 		ListCell<Friend> cell = new FriendListCell();
 		// cell.setContextMenu(value);
-		log.finer("Cell created");
+		log.finer("Cell created"); //$NON-NLS-1$
 		return cell;
 	}
 	

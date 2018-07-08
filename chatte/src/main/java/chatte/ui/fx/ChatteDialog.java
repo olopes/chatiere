@@ -64,14 +64,14 @@ public class ChatteDialog extends Stage {
 		    Button button = new Button( buttons[i] );
 		    button.setCancelButton(i==cancelIndex);
 		    button.setOnAction(new ButtonAction(i));
-		    button.getStyleClass().add("dialog-buttons");
+		    button.getStyleClass().add("dialog-buttons"); //$NON-NLS-1$
 		    button.setPrefWidth(100.0);
 		    buttonsPanel.getChildren().add(button);
 	    }
 	    
 		Text messageText = new Text(message);
 		// messageText.setWrappingWidth(250.0); // u wot m8?
-		messageText.getStyleClass().add("dialog-message");
+		messageText.getStyleClass().add("dialog-message"); //$NON-NLS-1$
 		
 		VBox vb = new VBox();
 	    vb.setPadding( new Insets(10,10,10,10) );
@@ -79,7 +79,7 @@ public class ChatteDialog extends Stage {
 	    vb.getChildren().addAll(messageText, buttonsPanel);
 
 	    Scene scene = new Scene(vb);
-		scene.getStylesheets().add(getClass().getResource("ChatteFX.css").toExternalForm());
+		scene.getStylesheets().add(getClass().getResource("ChatteFX.css").toExternalForm()); //$NON-NLS-1$
 
 		setScene(scene);
 		setTitle(title);
@@ -101,7 +101,7 @@ public class ChatteDialog extends Stage {
 		}
 		
         @Override public void handle( ActionEvent e ) {
-        	log.fine("Button clicked: "+buttonIndex);
+        	log.fine("Button clicked: "+buttonIndex); //$NON-NLS-1$
             close();
             selected = buttonIndex;
         }

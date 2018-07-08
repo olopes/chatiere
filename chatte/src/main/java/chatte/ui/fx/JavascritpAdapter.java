@@ -40,7 +40,7 @@ public class JavascritpAdapter {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				controller.appendInputImage(resource.replaceFirst("chato:", ""));
+				controller.appendInputImage(resource.replaceFirst("chato:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 				//stage.close();
 			}
 		});

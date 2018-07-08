@@ -114,7 +114,7 @@ public class Friend implements Serializable {
 	
 	@Override
 	public String toString() {
-		return new StringBuilder(getNick()).append(" [").append(getHost()).append("]").toString();
+		return new StringBuilder(getNick()).append(" [").append(getHost()).append("]").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public boolean isMyself() {

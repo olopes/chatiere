@@ -66,7 +66,7 @@ public class ResourceRequestHandler {
 	
 	@MessageListener
 	public void sendResource(ResourceMessage message) {
-		log.fine("New resource!! heheheheh!");
+		log.fine("New resource!! heheheheh!"); //$NON-NLS-1$
 		if(message.isRemote()) {
 			String newResource = resourceManager.addResource(message.getContents(), message.getType());
 			messageBroker.sendMessage(new ResourceUpdatedMessage(message.getFrom(), newResource));

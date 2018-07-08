@@ -42,12 +42,12 @@ SOFTWARE.
     </ImageView>
     <VBox maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" prefWidth="400.0" spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
       <children>
-        <Label fx:id="messageLabel" text="message" textAlignment="LEFT" wrapText="true">
+        <Label fx:id="messageLabel" text="%dialog.close.title" textAlignment="LEFT" wrapText="true">
           <font>
             <Font name="System Bold" size="13.0" />
           </font>
         </Label>
-        <Label fx:id="detailsLabel" text="details" textAlignment="LEFT" wrapText="true">
+        <Label fx:id="detailsLabel" text="%dialog.close.message" textAlignment="LEFT" wrapText="true">
           <font>
             <Font size="12.0" />
           </font>
@@ -62,14 +62,14 @@ SOFTWARE.
           </HBox.margin>
         </HBox>
         <Pane maxWidth="+Infinity" HBox.hgrow="ALWAYS" />
-        <Button fx:id="cancelButton" cancelButton="true" minWidth="80.0" mnemonicParsing="false" text="Cancel" HBox.hgrow="NEVER">
+        <Button fx:id="cancelButton" cancelButton="true" minWidth="80.0" mnemonicParsing="false" text="%dialog.close.cancel" HBox.hgrow="NEVER">
           <HBox.margin>
             <Insets />
           </HBox.margin>
         </Button>
         <HBox alignment="CENTER">
           <children>
-            <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" text="Ok" HBox.hgrow="NEVER">
+            <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" text="%dialog.close.exit" HBox.hgrow="NEVER">
               <HBox.margin>
                 <Insets left="14.0" />
               </HBox.margin>

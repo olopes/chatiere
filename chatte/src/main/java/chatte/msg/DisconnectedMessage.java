@@ -28,7 +28,7 @@ public class DisconnectedMessage extends StatusMessage {
 	private static final long serialVersionUID = 1L;
 
 	public DisconnectedMessage(Friend from) {
-		super(from, "disconnected");
+		super(from, "disconnected"); //$NON-NLS-1$
 	}
 
 }

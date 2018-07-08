@@ -29,42 +29,31 @@ import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
-public class NotifPopup extends Popup {
+public class NotifPopup extends Popup implements  EventHandler<ActionEvent> {
 
 	PauseTransition pause = new PauseTransition(Duration.seconds(10));
 	Label titleLabel = new Label();
 	Label messageLabel = new Label();
 	double locx, locy;
 	
-	public NotifPopup() {
-		setupUi();
+	public NotifPopup(Parent root) {
+		setupUi((Region)root);
 	}
 
-	private void setupUi() {
-		final int w = 300, h = 70;
-		titleLabel.getStyleClass().add("title-label");
-		messageLabel.getStyleClass().add("message-label");
-		VBox contents = new VBox(5.0);
-        contents.getStylesheets().add(getClass().getResource("ChatteFX.css").toExternalForm());
-		contents.getStyleClass().add("popup-notification");
-		
-		
-		contents.getChildren().addAll(titleLabel, messageLabel);
-		
+	private void setupUi(Region root) {
+		final double w = root.getWidth(), h = root.getHeight();
+
 	    setAutoFix(true);
 	    setAutoHide(true);
 	    setHideOnEscape(true);
-	    contents.setMaxSize(w, h);
-	    contents.setPrefSize(w, h);
-	    contents.setMinSize(w, h);
 		setWidth(w);
 		setHeight(h);
 	    
@@ -73,21 +62,16 @@ public class NotifPopup extends Popup {
 		locx = (primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - w - 10);
 		locy = (primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - h - 10);
 		
-		contents.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			public void handle(MouseEvent p0) {
-				hide();
-			};
-		});
-		pause.setOnFinished(new EventHandler<ActionEvent>() {
-		    @Override
-		    public void handle(ActionEvent event) {
-		        hide();
-		    }
-		});
+		pause.setOnFinished(this);
 		
-		getContent().add(contents);
+		getContent().add(root);
 	}
 	
+    @Override
+    public void handle(ActionEvent event) {
+        hide();
+    }
+    
 	public void setTitle(String text) {
 		titleLabel.setText(text);
 	}

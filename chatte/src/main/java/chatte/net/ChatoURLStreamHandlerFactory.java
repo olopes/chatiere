@@ -39,7 +39,7 @@ public class ChatoURLStreamHandlerFactory implements URLStreamHandlerFactory {
 	
 	@Override
 	public URLStreamHandler createURLStreamHandler(String protocol) {
-		if("chato".equals(protocol))
+		if("chato".equals(protocol)) //$NON-NLS-1$
 			return new ChatoURLStreamHandler(resourceManager);
 
 		return null;

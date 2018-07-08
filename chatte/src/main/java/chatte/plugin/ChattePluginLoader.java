@@ -53,7 +53,7 @@ public class ChattePluginLoader {
 				ChattePlugin plugin = provider.create(context);
 				knownPlugins.add(plugin);
 				messageBroker.sendMessage(new PluginRegistedMessage(me, plugin.getName(), plugin.getDescription(), plugin.getClass().getName()));
-				logger.info(String.format("Plugin %s (%s) registered", plugin.getName(), plugin.getClass().getName()));
+				logger.info(String.format("Plugin %s (%s) registered", plugin.getName(), plugin.getClass().getName())); //$NON-NLS-1$
 			}
 			ChattePluginLoader.knownPlugins = Collections.unmodifiableList(knownPlugins);
 		}

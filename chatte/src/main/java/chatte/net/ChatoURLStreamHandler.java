@@ -46,7 +46,7 @@ public class ChatoURLStreamHandler extends URLStreamHandler {
 
 	@Override
 	protected URLConnection openConnection(URL u) throws IOException {
-		log.fine("Opening connection to 'chato' url: "+u);
+		log.fine("Opening connection to 'chato' url: "+u); //$NON-NLS-1$
 		URL url = resourceManager.getResourceURL(u.getFile());
 		if(url != null)
 			return url.openConnection();

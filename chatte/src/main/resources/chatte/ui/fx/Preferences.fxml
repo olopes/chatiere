@@ -29,25 +29,37 @@ SOFTWARE.
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<VBox fx:id="preferences" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.PreferencesController">
+<VBox fx:id="preferences" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="316.0" prefWidth="322.0" spacing="3.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.PreferencesController">
    <children>
-      <Label text="Label" />
-      <TextField />
-      <Label text="Label" />
-      <TextField />
-      <Separator prefWidth="200.0" />
-      <Label text="Label" />
-      <TextField />
-      <Label text="Label" />
-      <TextField />
-      <Label text="Label" />
-      <TextField />
-      <Separator prefWidth="200.0" />
-      <Label text="Label" />
-      <TextField />
-      <Label text="Label" />
-      <TextField />
+      <TitledPane collapsible="false" text="%dialog.prefs.user.title">
+         <content>
+            <VBox spacing="3.0">
+               <children>
+                  <Label text="%dialog.prefs.user.nick" />
+                  <TextField fx:id="nickField" layoutY="18.0" />
+                  <Label layoutY="46.0" text="%dialog.prefs.user.port" />
+                  <TextField fx:id="portField" layoutY="64.0" onKeyTyped="#checkNumericKey" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
+         </content>
+      </TitledPane>
+      <TitledPane collapsible="false" text="%dialog.prefs.general.title">
+         <content>
+            <VBox spacing="10.0">
+               <children>
+                  <CheckBox fx:id="autoConnectCheck" mnemonicParsing="false" text="%dialog.prefs.general.autoconnect" />
+                  <CheckBox fx:id="blinkToolbarCheck" mnemonicParsing="false" text="%dialog.prefs.general.blink" />
+                  <CheckBox fx:id="showNotifsCheck" mnemonicParsing="false" text="%dialog.prefs.general.notifs" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
+         </content>
+      </TitledPane>
       <HBox maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity">
          <children>
             <HBox alignment="CENTER">
@@ -56,14 +68,14 @@ SOFTWARE.
                </HBox.margin>
             </HBox>
             <Pane maxWidth="+Infinity" HBox.hgrow="ALWAYS" />
-            <Button fx:id="cancelButton" cancelButton="true" minWidth="80.0" mnemonicParsing="false" text="Cancel" HBox.hgrow="NEVER">
+            <Button fx:id="cancelButton" cancelButton="true" minWidth="80.0" mnemonicParsing="false" onAction="#doCancelClick" text="%btn.cancel" HBox.hgrow="NEVER">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Button>
             <HBox alignment="CENTER">
                <children>
-                  <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" text="Ok" HBox.hgrow="NEVER">
+                  <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" onAction="#doOkClick" text="%btn.ok" HBox.hgrow="NEVER">
                      <HBox.margin>
                         <Insets left="14.0" />
                      </HBox.margin>

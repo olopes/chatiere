@@ -33,7 +33,7 @@ public class MySelf extends Friend {
 	
 	@Override
 	public String getHost() {
-		return "localhost";
+		return "localhost"; //$NON-NLS-1$
 	}
 	
 	@Override

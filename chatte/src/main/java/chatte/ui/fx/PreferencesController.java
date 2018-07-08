@@ -24,17 +24,34 @@
  */
 package chatte.ui.fx;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 
 public class PreferencesController extends BaseChatteController {
 	
+	// root panel
 	@FXML Parent preferences;
 	
+	// text fields
+	@FXML TextField nickField;
+	@FXML TextField portField;
+	@FXML CheckBox  autoConnectCheck;
+	@FXML CheckBox  blinkToolbarCheck;
+	@FXML CheckBox  showNotifsCheck;
+	
+	
+	// buttons
 	@FXML Button okButton;
 	@FXML Button cancelButton;
 	
@@ -43,10 +60,30 @@ public class PreferencesController extends BaseChatteController {
 		super(configService, resourceManager, messageBroker);
 	}
 
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		super.initialize(arg0, arg1);
+		
+		
+	}
+	
 	public Parent getRoot() {
 		// TODO Auto-generated method stub
 		return preferences;
 	}
 	
+	public void checkNumericKey(KeyEvent evt) {
+		if(!evt.getCharacter().matches("[0-9]")) { //$NON-NLS-1$
+			evt.consume();
+		}
+	}
+	
+	public void doOkClick(ActionEvent evt) {
+		
+	}
+
+	public void doCancelClick(ActionEvent evt) {
+		
+	}
 
 }

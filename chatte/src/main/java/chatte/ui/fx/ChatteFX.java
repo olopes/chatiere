@@ -219,12 +219,12 @@ public class ChatteFX extends Application {
         vbox.setPadding(new Insets(10.0));
  
         final Label loginLabel = new Label();
-        loginLabel.setText("name");
+        loginLabel.setText(resourceBundle.getString("dialog.login.storeKey"));
         
         final PasswordField passwordBox = new PasswordField();
-        passwordBox.setPromptText("password");
+        passwordBox.setPromptText(resourceBundle.getString("dialog.login.password"));
         
-        final Button button = new Button("Log in");
+        final Button button = new Button(resourceBundle.getString("dialog.login.btn"));
         button.setDefaultButton(true);
         button.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent t) {

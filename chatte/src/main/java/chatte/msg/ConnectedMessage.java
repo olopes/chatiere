@@ -28,7 +28,7 @@ public class ConnectedMessage extends StatusMessage {
 	private static final long serialVersionUID = 1L;
 
 	public ConnectedMessage(Friend from) {
-		super(from, "connected");
+		super(from, "connected"); //$NON-NLS-1$
 	}
 
 }

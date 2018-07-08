@@ -64,19 +64,19 @@ public class MsgWorker implements Runnable {
 		try {
 			out = sock.getOutputStream();
 			in = sock.getInputStream();
-			log.info("1. Streams created");
+			log.info("1. Streams created"); //$NON-NLS-1$
 		} catch(Exception e) {
-			log.log(Level.SEVERE, "Socket stream creation failed", e);
+			log.log(Level.SEVERE, "Socket stream creation failed", e); //$NON-NLS-1$
 		}
 
 	}
 
 	@MessageListener
 	public void sendOutboundMessage(OutboundMessage message) {
-		log.fine("sending message "+message);
+		log.fine("sending message "+message); //$NON-NLS-1$
 		if(message.getContents()==null) return;
 		try {
-			String sizeStr = String.format("%08x", message.getContents().length);
+			String sizeStr = String.format("%08x", message.getContents().length); //$NON-NLS-1$
 			out.write(sizeStr.getBytes());
 			out.write(message.getContents());
 			out.flush();
@@ -87,7 +87,7 @@ public class MsgWorker implements Runnable {
 	
 	
 	void dispatchMessage(AbstractMessage message) {
-		log.fine(" => dispatching received message :-D ("+message.getClass().getSimpleName()+")");
+		log.fine(" => dispatching received message :-D ("+message.getClass().getSimpleName()+")"); //$NON-NLS-1$ //$NON-NLS-2$
 		message.setRemote(true);
 		message.setFrom(me);
 		messageBroker.sendMessage(message);
@@ -95,7 +95,7 @@ public class MsgWorker implements Runnable {
 	
 	@Override
 	public void run() {
-		log.info("Starting client worker...");
+		log.info("Starting client worker..."); //$NON-NLS-1$
 		messageBroker.addListener(this);
 		try {
 			// protocol negotiation.
@@ -105,12 +105,12 @@ public class MsgWorker implements Runnable {
 			welcome.setNick(server.getNick()); // from config
 			welcome.setPort(server.getPort()); // from config
 			welcome.setKnownFriends(server.getConnectedFriends());
-			log.info("1. Welcome message ready");
+			log.info("1. Welcome message ready"); //$NON-NLS-1$
 			sendOutboundMessage(NetCodec.convertMessage(welcome));
 
-			log.info("2. Welcome message sent");
+			log.info("2. Welcome message sent"); //$NON-NLS-1$
 			
-			log.info("3. Waiting...");
+			log.info("3. Waiting..."); //$NON-NLS-1$
 			byte [] sizebuf = new byte[8];
 			while(sock.isConnected()) {
 				// shitty shit can be shitty if one is not careful enough
@@ -124,9 +124,9 @@ public class MsgWorker implements Runnable {
 			}
 			
 		} catch(IOException e) {
-			log.log(Level.SEVERE, "Something bad happened....", e);
+			log.log(Level.SEVERE, "Something bad happened....", e); //$NON-NLS-1$
 		} finally {
-			log.info("4. Disconnected.");
+			log.info("4. Disconnected."); //$NON-NLS-1$
 			messageBroker.removeListener(this);
 			messageBroker.sendMessage(new DisconnectedMessage(me));
 		}
