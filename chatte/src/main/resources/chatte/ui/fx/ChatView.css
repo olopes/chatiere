@@ -23,6 +23,12 @@
  * 
  */
 
+@font-face {
+    font-family: NotoColorEmoji;
+    src: url(NotoColorEmoji.ttf);
+    src: url(NotoColorEmoji.ttf) format('truetype');
+}
+
 body {
 	font-family: OpenSansEmoji;
 	font-size: 10pt;
@@ -89,6 +95,31 @@ img.img-list {
 }
 
 img.img-list:hover {
+	cursor: pointer;
+}
+
+span.emoji {
+	font-family: NotoColorEmoji;
+}
+div.emoji-list div {
+	font-size: 16pt;
+	font-weight: bold;
+	margin-top: 20px;
+	padding-left: 20px;
+}
+
+div.emoji-list span.emoji {
+	display: inline-block;
+	padding: 5px;
+	width: 100px;
+	font-size: 20pt;
+	padding: 5px;
+	border: 1px solid #eeeeee;
+	width: 25pt;
+	height: 25pt;
+}
+
+div.emoji-list span.emoji:hover {
 	cursor: pointer;
 }
 

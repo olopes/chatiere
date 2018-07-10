@@ -508,5 +508,11 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		listView.getItems().remove(friend);
 		displayStatusMessage(message);
 	}
+
+	public void appendEmoji(String emoji) {
+		WebEngine engine = inputArea.getEngine();
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("appendEmoji", emoji); //$NON-NLS-1$
+	}
 	
 }

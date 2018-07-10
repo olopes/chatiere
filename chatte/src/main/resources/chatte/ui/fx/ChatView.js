@@ -59,9 +59,12 @@ function appendImage(resource) {
 	return imgEl;
 }
 
-function doSelectResource() {
-	// document.write('asdasdas '+this.src);
-	app.select(this.src);
+function appendEmoji(emoji) {
+	var imgEl = document.createElement('SPAN');
+	imgEl.className='emoji';
+	imgEl.innerText=emoji;
+	document.body.appendChild(imgEl);
+	return imgEl;
 }
 
 function loadResources(resources) {
@@ -70,7 +73,29 @@ function loadResources(resources) {
 		img = appendImage(resources[i]);
 		img.className='img-list';
 		img.width = 100;
-		img.onclick=doSelectResource;
 	}
 }
+
+function doSelectResource(element) {
+	app.selectResource(element.src);
+}
+
+function doSelectEmoji(element) {
+	alert(element.title+' '+element.innerText);
+	app.selectEmoji(element.innerText);
+}
+
+function handleEmojiClick (evt) {
+	if(evt.target.tagName === 'SPAN' && evt.target.className === 'emoji')
+		doSelectEmoji(evt.target);
+	return false;
+}
+
+function handleResourceClick (evt) {
+	if(evt.target.tagName === 'DIV' && evt.target.className === 'img-list')
+		doSelectResource(evt.target);
+	return false;
+}
+
+
 

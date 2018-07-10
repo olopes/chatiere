@@ -36,11 +36,21 @@ public class JavascritpAdapter {
 		this.controller=controller;
 	}
 	
-	public void select(final String resource) {
+	public void selectResource(final String resource) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
 				controller.appendInputImage(resource.replaceFirst("chato:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+				//stage.close();
+			}
+		});
+	}
+
+	public void selectEmoji(final String emoji) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				controller.appendEmoji(emoji);
 				//stage.close();
 			}
 		});
