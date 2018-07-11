@@ -74,39 +74,39 @@ SOFTWARE.
 							<top>
 								<ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 									<items>
-										<Button fx:id="preferencesBtn" mnemonicParsing="false" onAction="#doOpenPreferences" styleClass="toolbar-buttons" text="%btn.prefs">
+										<Button mnemonicParsing="false" onAction="#doOpenPreferences" styleClass="toolbar-buttons" text="%btn.prefs">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.prefs" />
 											</tooltip>
 										</Button>
-										<Button fx:id="emoticonBtn" mnemonicParsing="false" onAction="#doOpenEmoticonPanel" styleClass="toolbar-buttons" text="%btn.emoticon">
+										<Button mnemonicParsing="false" onAction="#doOpenEmoticonPanel" styleClass="toolbar-buttons" text="%btn.emoticon">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.emoticon" />
 											</tooltip>
 										</Button>
-										<Button fx:id="addImgBtn" mnemonicParsing="false" onAction="#doAddImage" styleClass="toolbar-buttons" text="%btn.addimg">
+										<Button mnemonicParsing="false" onAction="#doAddImage" styleClass="toolbar-buttons" text="%btn.addimg">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.addimg" />
 											</tooltip>
 										</Button>
-										<Button fx:id="pasteBtn" mnemonicParsing="false" onAction="#doPasteImage" styleClass="toolbar-buttons" text="%btn.paste">
+										<Button mnemonicParsing="false" onAction="#doPasteImage" styleClass="toolbar-buttons" text="%btn.paste">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.paste" />
 											</tooltip>
 										</Button>
-										<Button fx:id="snipBtn" mnemonicParsing="false" onAction="#doOpenSnipingTool" styleClass="toolbar-buttons" text="%btn.snip">
+										<Button mnemonicParsing="false" onAction="#doOpenSnipingTool" styleClass="toolbar-buttons" text="%btn.snip">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.snip" />
 											</tooltip>
 										</Button>
 										<Region fx:id="leftSpring" />
-										<Button fx:id="clsBtn" mnemonicParsing="false" onAction="#doPanic" styleClass="toolbar-buttons" text="%btn.cls">
+										<Button mnemonicParsing="false" onAction="#doPanic" styleClass="toolbar-buttons" text="%btn.cls">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.cls" />
 											</tooltip>
 										</Button>
 										<Region fx:id="rightSpring" />
-										<Button fx:id="sendBtn" mnemonicParsing="false" onAction="#doSend" styleClass="toolbar-buttons" text="%btn.send">
+										<Button mnemonicParsing="false" onAction="#doSend" styleClass="toolbar-buttons" text="%btn.send">
 											<tooltip>
 												<Tooltip text="%tooltip.btn.send" />
 											</tooltip>

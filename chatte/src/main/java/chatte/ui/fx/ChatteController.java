@@ -29,8 +29,10 @@ import javafx.stage.Window;
 
 public interface ChatteController {
 
-	Window createWindow(Window owner);
+	Window createWindow(ChatteController owner);
 	
 	Parent getRoot();
+
+	Window getWindow();
 	
 }

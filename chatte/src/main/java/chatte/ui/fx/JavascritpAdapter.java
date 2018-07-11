@@ -25,18 +25,19 @@
 package chatte.ui.fx;
 
 import javafx.application.Platform;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class JavascritpAdapter {
-	Stage stage;
+	Window stage;
 	ChatteMainController controller;
 
-	public JavascritpAdapter(Stage stage, ChatteMainController controller) {
+	public JavascritpAdapter(Window stage, ChatteMainController controller) {
 		this.stage=stage;
 		this.controller=controller;
 	}
 	
 	public void selectResource(final String resource) {
+		System.out.println("Escolher a resource");
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -47,6 +48,7 @@ public class JavascritpAdapter {
 	}
 
 	public void selectEmoji(final String emoji) {
+		System.out.println("Escolher o emoji");
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {

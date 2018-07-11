@@ -30,7 +30,6 @@ import chatte.resources.ResourceManager;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class NotifController extends BaseChatteController {
@@ -44,14 +43,14 @@ public class NotifController extends BaseChatteController {
 	}
 
 	@Override
-	public synchronized Window createWindow(Window parent) {
+	public synchronized Window createWindow(ChatteController parent) {
 		if(window == null)
 			window = new NotifPopup(notifPanel);
 		return window;
 	}
 
-	public void show(Stage owner, String title, String message) {
-		window.show(owner, title, message);
+	public void show(ChatteController parent, String title, String message) {
+		window.show(parent.getWindow(), title, message);
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class NotifController extends BaseChatteController {
 	}
 	
 	@Override
-	public void showWindow(Window owner) {
+	public void showWindow(ChatteController owner) {
 	}
 	
 	@FXML

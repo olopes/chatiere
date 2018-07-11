@@ -62,12 +62,12 @@ public abstract class BaseChatteController implements Initializable, ChatteContr
 	}
 
 	@Override
-	public synchronized Window createWindow(Window parent) {
+	public synchronized Window createWindow(ChatteController parent) {
 		// TODO display preferences window
 		if(window == null) {
 			// load FXML
 			window = new Stage(StageStyle.UTILITY);
-			window.initOwner(parent);
+			window.initOwner(parent.getWindow());
 			window.initModality(Modality.WINDOW_MODAL);
 			window.setScene(new Scene(getRoot()));
 		}
@@ -75,9 +75,14 @@ public abstract class BaseChatteController implements Initializable, ChatteContr
 		
 		return window;
 	}
+	
+	@Override
+	public Window getWindow() {
+		return window;
+	}
 
-	public void showWindow(Window owner) {
-		((Stage)createWindow(owner)).showAndWait();
+	public void showWindow(ChatteController owner) {
+		((Stage)createWindow(owner)).show();
 	}
 
 

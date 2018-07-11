@@ -23,12 +23,6 @@
  * 
  */
 
-@font-face {
-    font-family: NotoColorEmoji;
-    src: url(NotoColorEmoji.ttf);
-    src: url(NotoColorEmoji.ttf) format('truetype');
-}
-
 body {
 	font-family: OpenSansEmoji;
 	font-size: 10pt;
@@ -98,9 +92,6 @@ img.img-list:hover {
 	cursor: pointer;
 }
 
-span.emoji {
-	font-family: NotoColorEmoji;
-}
 div.emoji-list div {
 	font-size: 16pt;
 	font-weight: bold;

@@ -55,15 +55,10 @@ import chatte.msg.TypedMessage;
 import chatte.msg.WelcomeMessage;
 import chatte.resources.ResourceManager;
 import chatte.ui.UserColors;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -89,21 +84,10 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	@FXML WebView inputArea;
 
 	// Contact list buttons
-	@FXML Region leftContactSpring;
-	@FXML Button addContact;
-	@FXML Button removeContact;
-	@FXML Region rightContactSpring;
 
 	// toolbar buttons
-	@FXML Button preferencesBtn;
-	@FXML Button emoticonBtn;
-	@FXML Button addImgBtn;
-	@FXML Button pasteBtn;
 	@FXML Region leftSpring;
-	@FXML Button clsBtn;
 	@FXML Region rightSpring;
-	@FXML Button sendBtn;
-	@FXML Button snipBtn;
 	
 	// Controller factory used to create this controller
 	@FXML ControllerFactory controllerFactory;
@@ -113,12 +97,11 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	ContactsController contactPanelController;
 	NotifController notifPopupController;
 	AlertController alertController;
+	EmojiController emojiController;
 
 	
 	// class specific stuff
 	Stage window;
-	Stage pickerStage;
-	WebView pickerView;
 	ResourceBundle bundle;
 	Friend me;
 	MessageBroker messageBroker;
@@ -182,10 +165,11 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	}
 	
 	@Override
-	public Window createWindow(Window parent) {
+	public Window createWindow(ChatteController parent) {
 		return getWindow();
 	}
 
+	@Override
 	public Stage getWindow() {
 		return window;
 	}
@@ -200,7 +184,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		notifPopupController = manager.newFxml("NotifPopup.fxml", this); //$NON-NLS-1$
 		preferencesController = manager.newFxml("Preferences.fxml", this); //$NON-NLS-1$
 		contactPanelController = manager.newFxml("Contacts.fxml", this); //$NON-NLS-1$
-		
+		emojiController = manager.newFxml("EmojiSelection.fxml", this); //$NON-NLS-1$
 		
 	}
 	
@@ -301,39 +285,14 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	
 	@FXML
 	void doOpenPreferences(ActionEvent event) throws Exception {
-		preferencesController.showWindow(getWindow());
+		preferencesController.showWindow(this);
 	}
 	
 	@FXML
 	void doOpenEmoticonPanel(ActionEvent event) {
-		if(pickerStage == null) {
-			pickerStage = new Stage();
-			pickerStage.initOwner(window);
-			pickerView = new WebView();
-			pickerView.setContextMenuEnabled(false);
-			
-			pickerStage.setScene(new Scene(pickerView, 640, 400));
-
-			WebEngine engine = pickerView.getEngine();
-			engine.setJavaScriptEnabled(true);
-			engine.getLoadWorker().stateProperty().addListener(
-					new ChangeListener<State>() {
-						@Override
-						public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
-							if (newState == State.SUCCEEDED) {
-								JSObject htmlWindow = (JSObject) pickerView.getEngine().executeScript("window"); //$NON-NLS-1$
-								htmlWindow.setMember("app", new JavascritpAdapter(pickerStage, ChatteMainController.this)); //$NON-NLS-1$
-								htmlWindow.call("loadResources", (Object)resourceManager.getResources()); //$NON-NLS-1$
-							}
-						}
-					});
-
-		}
-		pickerView.getEngine().load(getClass().getResource("EmoticonView.html").toExternalForm()); //$NON-NLS-1$
-		pickerStage.show();
+		emojiController.showWindow(this);
 	}
 
-	
 	@FXML
 	void doAddImage(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
@@ -469,7 +428,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		htmlWindow.call("displayMessage", htmlMessage); //$NON-NLS-1$
 		history.recordMessage(htmlMessage, message.getResourceRefs());
 		
-		notifPopupController.show(window, message.getNick(), message.getMessage());
+		notifPopupController.show(this, message.getNick(), message.getMessage());
 		// mainWindow.toFront();
 	}
 	

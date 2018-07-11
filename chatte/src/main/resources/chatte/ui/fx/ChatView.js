@@ -60,11 +60,9 @@ function appendImage(resource) {
 }
 
 function appendEmoji(emoji) {
-	var imgEl = document.createElement('SPAN');
-	imgEl.className='emoji';
-	imgEl.innerText=emoji;
-	document.body.appendChild(imgEl);
-	return imgEl;
+	var node = document.createTextNode(emoji);
+	document.body.appendChild(node);
+	return node;
 }
 
 function loadResources(resources) {
@@ -81,18 +79,17 @@ function doSelectResource(element) {
 }
 
 function doSelectEmoji(element) {
-	alert(element.title+' '+element.innerText);
 	app.selectEmoji(element.innerText);
 }
 
 function handleEmojiClick (evt) {
-	if(evt.target.tagName === 'SPAN' && evt.target.className === 'emoji')
+	if(evt.target.tagName === 'SPAN')
 		doSelectEmoji(evt.target);
 	return false;
 }
 
 function handleResourceClick (evt) {
-	if(evt.target.tagName === 'DIV' && evt.target.className === 'img-list')
+	if(evt.target.tagName === 'IMG')
 		doSelectResource(evt.target);
 	return false;
 }
