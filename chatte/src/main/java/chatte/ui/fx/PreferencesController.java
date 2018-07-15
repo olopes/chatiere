@@ -90,6 +90,15 @@ public class PreferencesController extends BaseChatteController {
 		return preferences;
 	}
 	
+	@Override
+	public void showWindow(ChatteController owner) {
+//		boolean manual = (proxyMode.getValue() == ProxyMode.MANUAL);
+//		proxyHost.setEditable(manual);
+//		proxyPort.setEditable(manual);
+		
+		super.showWindow(owner);
+	}
+	
 	public void checkNumericKey(KeyEvent evt) {
 		if(!evt.getCharacter().matches("[0-9]")) { //$NON-NLS-1$
 			evt.consume();
@@ -105,7 +114,9 @@ public class PreferencesController extends BaseChatteController {
 	}
 	
 	public void toggleProxyFields(ActionEvent evt) {
-		
+		boolean manual = (proxyMode.getValue() == ProxyMode.MANUAL);
+		proxyHost.setEditable(manual);
+		proxyPort.setEditable(manual);
 	}
 
 }
