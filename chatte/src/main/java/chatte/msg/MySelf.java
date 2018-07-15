@@ -24,9 +24,19 @@
  */
 package chatte.msg;
 
+import chatte.net.ProxyMode;
+
 public class MySelf extends Friend {
 	private static final long serialVersionUID = 1L;
 
+	boolean autoConnect;
+	boolean blinkToolbar;
+	boolean showNotifications;
+	ProxyMode proxyMode;
+	String proxyHost;
+	Integer proxyPort;
+
+	
 	public MySelf() {
 		super.setConnected(true);
 	}
@@ -38,10 +48,59 @@ public class MySelf extends Friend {
 	
 	@Override
 	public void setConnected(boolean connected) {
-		// do nothing
+		// do nothing, always connected
 	}
 	
 	public boolean isMyself() {
-		return false;
+		return true;
 	}
+
+	public boolean isAutoConnect() {
+		return autoConnect;
+	}
+
+	public void setAutoConnect(boolean autoConnect) {
+		this.autoConnect = autoConnect;
+	}
+
+	public boolean isBlinkToolbar() {
+		return blinkToolbar;
+	}
+
+	public void setBlinkToolbar(boolean blinkToolbar) {
+		this.blinkToolbar = blinkToolbar;
+	}
+
+	public boolean isShowNotifications() {
+		return showNotifications;
+	}
+
+	public void setShowNotifications(boolean showNotifications) {
+		this.showNotifications = showNotifications;
+	}
+
+	public ProxyMode getProxyMode() {
+		return proxyMode;
+	}
+
+	public void setProxyMode(ProxyMode proxyMode) {
+		this.proxyMode = proxyMode;
+	}
+
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+
+	public Integer getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+	
 }

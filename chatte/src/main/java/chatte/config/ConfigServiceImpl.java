@@ -24,34 +24,44 @@
  */
 package chatte.config;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import chatte.msg.Friend;
 import chatte.msg.MySelf;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ConfigServiceImpl implements ConfigService {
 
 	private static int DEFAULT_PORT = 6666;
 
 	private MySelf me = new MySelf();
-	private Map<String, Friend> knownFriends;
-
+	private ConfigMap knownFriends;
+	private final JAXBContext jaxbContext;
+	
 	public ConfigServiceImpl() {
+		try {
+			jaxbContext = JAXBContext.newInstance(ConfigMap.class);
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
 		loadConfig();
 	}
 
@@ -63,21 +73,22 @@ public class ConfigServiceImpl implements ConfigService {
 	void loadConfig() {
 		File cfgFile = new File("config.xml"); //$NON-NLS-1$
 		if(cfgFile.exists()) {
-			try (XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(cfgFile)))) {
-				@SuppressWarnings("unchecked")
-				Map<String, Friend> readObject = (Map<String, Friend>) decoder.readObject();
-				knownFriends = readObject;
+			try {
+				Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+				try (InputStream input = new BufferedInputStream(new FileInputStream(cfgFile))) {
+					ConfigMap readObject =  (ConfigMap) unmarshaller.unmarshal(input);
+					knownFriends = readObject;
+				}
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Error reading config.xml", e); //$NON-NLS-1$
 				// TODO handle this....
 			}
 			me = (MySelf) knownFriends.get(me.getHost());
-			
 		} else {
 			me = new MySelf();
 			me.setNick(System.getProperty("user.name", "me")); //$NON-NLS-1$ //$NON-NLS-2$
 			me.setPort(DEFAULT_PORT);
-			knownFriends = new LinkedHashMap<>();
+			knownFriends = new ConfigMap();
 			knownFriends.put(me.getHost(), me);
 			saveConfig();
 		}
@@ -86,8 +97,11 @@ public class ConfigServiceImpl implements ConfigService {
 	void saveConfig() {
 		File cfgFile = new File("config.xml"); //$NON-NLS-1$
 		if(cfgFile.exists()) cfgFile.delete();
-		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(cfgFile)))) {
-			encoder.writeObject(knownFriends);
+		try {
+			Marshaller marshaller = jaxbContext.createMarshaller();
+			try (OutputStream output = new BufferedOutputStream(new FileOutputStream(cfgFile))) {
+				marshaller.marshal(knownFriends, output);
+			}
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Error saving config.xml", ex); //$NON-NLS-1$
 		}
@@ -104,7 +118,7 @@ public class ConfigServiceImpl implements ConfigService {
 	}
 
 	@Override
-	public Friend getSelf() {
+	public MySelf getSelf() {
 		return me;
 	}
 	
@@ -164,5 +178,10 @@ public class ConfigServiceImpl implements ConfigService {
 		// fetch true reference to friend
 		String realHost = fixHost(friend.getHost());
 		knownFriends.remove(realHost);
+	}
+	
+	@XmlRootElement(name="knownFriends")
+	public static class ConfigMap extends LinkedHashMap<String, Friend> {
+		private static final long serialVersionUID = 1L;
 	}
 }

@@ -27,6 +27,7 @@ package chatte.config;
 import java.util.List;
 
 import chatte.msg.Friend;
+import chatte.msg.MySelf;
 
 public interface ConfigService {
 
@@ -34,7 +35,7 @@ public interface ConfigService {
 	
 	int getPort();
 	
-	Friend getSelf();
+	MySelf getSelf();
 	
 	List<Friend> getKnownFriends();
 	

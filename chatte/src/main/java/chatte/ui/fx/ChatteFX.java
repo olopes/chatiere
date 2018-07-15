@@ -26,6 +26,7 @@ package chatte.ui.fx;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.ProxySelector;
 import java.net.URL;
 import java.security.KeyStore;
 import java.util.ResourceBundle;
@@ -38,6 +39,7 @@ import chatte.config.ConfigServiceImpl;
 import chatte.msg.ChatoMessageBroker;
 import chatte.msg.MessageBroker;
 import chatte.msg.StopServicesMessage;
+import chatte.net.ChatoProxySelector;
 import chatte.net.ChatoURLStreamHandlerFactory;
 import chatte.plugin.ChattePluginLoader;
 import chatte.resources.ChatoResourceManager;
@@ -93,6 +95,7 @@ public class ChatteFX extends Application {
 				}
 			}
 		}
+		
 		Logger.getLogger("chatte.ui.fx.ChatteFX").severe("Starting ChatteFX"); //$NON-NLS-1$ //$NON-NLS-2$
 		launch(ChatteFX.class, args);
 	}
@@ -114,6 +117,10 @@ public class ChatteFX extends Application {
 		messageBroker.addListener(resourceRequestHandler);
 		URL.setURLStreamHandlerFactory(new ChatoURLStreamHandlerFactory(resourceManager));
 
+		// Configure proxy
+		System.setProperty("java.net.useSystemProxies", "true");
+		ProxySelector.setDefault(new ChatoProxySelector(ProxySelector.getDefault(), configService.getSelf()));
+		
 		// start network listener
 		// new Thread(new chatte.net.MsgListener(messageBroker, configService), "MsgListener").start();
 		
