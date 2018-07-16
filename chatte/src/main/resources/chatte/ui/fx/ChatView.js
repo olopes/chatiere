@@ -60,9 +60,11 @@ function appendImage(resource) {
 }
 
 function appendEmoji(emoji) {
-	var node = document.createTextNode(emoji);
-	document.body.appendChild(node);
-	return node;
+	var emoEl = document.createElement('SPAN');
+	emoEl.className='emoji';
+	emoEl.innerText = emoji;
+	document.body.appendChild(emoEl);
+	return emoEl;
 }
 
 function loadResources(resources) {
@@ -72,14 +74,6 @@ function loadResources(resources) {
 		img.className='img-list';
 		img.width = 100;
 	}
-}
-
-function doSelectResource(element) {
-	app.selectResource(element.src);
-}
-
-function doSelectEmoji(element) {
-	app.selectEmoji(element.innerText);
 }
 
 function handleEmojiClick (evt) {
@@ -92,6 +86,15 @@ function handleResourceClick (evt) {
 	if(evt.target.tagName === 'IMG')
 		doSelectResource(evt.target);
 	return false;
+}
+
+// The application controller will capture the alert event and handle it accordingly
+function doSelectResource(element) {
+	alert(element.src);
+}
+
+function doSelectEmoji(element) {
+	alert(element.innerText);
 }
 
 

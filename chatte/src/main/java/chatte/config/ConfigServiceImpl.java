@@ -31,11 +31,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,6 +45,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import chatte.msg.Friend;
@@ -53,7 +57,7 @@ public class ConfigServiceImpl implements ConfigService {
 	private static int DEFAULT_PORT = 6666;
 
 	private MySelf me = new MySelf();
-	private ConfigMap knownFriends;
+	private Map<String,Friend> knownFriends;
 	private final JAXBContext jaxbContext;
 	
 	public ConfigServiceImpl() {
@@ -77,19 +81,18 @@ public class ConfigServiceImpl implements ConfigService {
 				Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 				try (InputStream input = new BufferedInputStream(new FileInputStream(cfgFile))) {
 					ConfigMap readObject =  (ConfigMap) unmarshaller.unmarshal(input);
-					knownFriends = readObject;
+					knownFriends = readObject.getFriends();
+					me = readObject.getMe();
 				}
 			} catch (Exception e) {
 				log.log(Level.SEVERE, "Error reading config.xml", e); //$NON-NLS-1$
 				// TODO handle this....
 			}
-			me = (MySelf) knownFriends.get(me.getHost());
 		} else {
 			me = new MySelf();
 			me.setNick(System.getProperty("user.name", "me")); //$NON-NLS-1$ //$NON-NLS-2$
 			me.setPort(DEFAULT_PORT);
-			knownFriends = new ConfigMap();
-			knownFriends.put(me.getHost(), me);
+			knownFriends = new HashMap<>();
 			saveConfig();
 		}
 	}
@@ -100,7 +103,7 @@ public class ConfigServiceImpl implements ConfigService {
 		try {
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			try (OutputStream output = new BufferedOutputStream(new FileOutputStream(cfgFile))) {
-				marshaller.marshal(knownFriends, output);
+				marshaller.marshal(new ConfigMap(me, knownFriends), output);
 			}
 		} catch (Exception ex) {
 			log.log(Level.SEVERE, "Error saving config.xml", ex); //$NON-NLS-1$
@@ -131,6 +134,7 @@ public class ConfigServiceImpl implements ConfigService {
 	public Friend getFriend(String addr) {
 		// resolve??
 		String host = fixHost(addr);
+		if(me.getHost().equals(host)) return me;
 		Friend ff = knownFriends.get(host);
 		if(null == ff) {
 			ff = new Friend();
@@ -146,6 +150,7 @@ public class ConfigServiceImpl implements ConfigService {
 	public void addFriend(Friend friend) {
 		if(null == friend) return;
 		String host = fixHost(friend.getHost());
+		if(me.getHost().equals(host)) return;
 		log.info("Registering new friend with host "+host); //$NON-NLS-1$
 		if(me.getHost().equals(host)) {
 			me.setNick(friend.getNick());
@@ -163,6 +168,7 @@ public class ConfigServiceImpl implements ConfigService {
 	
 	String fixHost(String host) {
 		if(null == host) return host;
+		// TODO local hosts?
 		if(me.getHost().equals(host)) return host;
 		try {
 			return InetAddress.getByName(host).getHostAddress();
@@ -180,8 +186,38 @@ public class ConfigServiceImpl implements ConfigService {
 		knownFriends.remove(realHost);
 	}
 	
-	@XmlRootElement(name="knownFriends")
-	public static class ConfigMap extends LinkedHashMap<String, Friend> {
+	@XmlRootElement(name="KnownFriends")
+	@XmlAccessorType(XmlAccessType.FIELD)
+	public static class ConfigMap implements Serializable {
 		private static final long serialVersionUID = 1L;
+
+		MySelf me;
+		Map<String, Friend> friends;
+
+		public ConfigMap() {
+			this(null, null);
+		}
+
+		public ConfigMap(MySelf me, Map<String, Friend> knownFriends) {
+			this.friends = knownFriends;
+			this.me = me;
+		}
+
+		public Map<String, Friend> getFriends() {
+			return friends;
+		}
+
+		public void setFriends(Map<String, Friend> friends) {
+			this.friends = friends;
+		}
+
+		public MySelf getMe() {
+			return me;
+		}
+
+		public void setMe(MySelf me) {
+			this.me = me;
+		}
+
 	}
 }

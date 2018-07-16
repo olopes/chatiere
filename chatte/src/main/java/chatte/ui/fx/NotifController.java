@@ -50,7 +50,7 @@ public class NotifController extends BaseChatteController {
 	}
 
 	public void show(ChatteController parent, String title, String message) {
-		window.show(parent.getWindow(), title, message);
+		((NotifPopup)createWindow(parent)).show(parent.getWindow(), title, message);
 	}
 
 	@Override

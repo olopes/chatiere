@@ -27,25 +27,29 @@ package chatte.ui.fx;
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker.State;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import netscape.javascript.JSObject;
 
-public class EmojiController extends BaseChatteController {
+public class EmojiController extends BaseChatteController implements EventHandler<WebEvent<String>>, ChangeListener<State> {
 	
 	@FXML Parent emojiSelectionPanel;
 	
 	@FXML WebView gifsView;
 	@FXML WebView emojiView;
 	
+	ChatteMainController parentController;
 	ResourceManager resourceManager;
 	
 	public EmojiController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
@@ -61,20 +65,20 @@ public class EmojiController extends BaseChatteController {
 	@Override
 	public synchronized Window createWindow(final ChatteController parent) {
 		if(window == null) {
+			parentController = (ChatteMainController) parent;
 			window = new Stage();
 			window.initOwner(window);
 			
 			window.setScene(new Scene(getRoot(), 640, 400));
 			
 			WebEngine gifEngine = gifsView.getEngine();
+			gifEngine.setOnAlert(this);
 			gifEngine.setJavaScriptEnabled(true);
-			gifEngine.getLoadWorker().stateProperty().addListener(new StateChangeListener(gifEngine,
-					new JavascritpAdapter(window, (ChatteMainController) parent), resourceManager));
+			gifEngine.getLoadWorker().stateProperty().addListener(this);
 
 			WebEngine emoEngine = emojiView.getEngine();
+			emoEngine.setOnAlert(this);
 			emoEngine.setJavaScriptEnabled(true);
-			emoEngine.getLoadWorker().stateProperty().addListener(new StateChangeListener(emoEngine,
-					new JavascritpAdapter(window, (ChatteMainController) parent), null));
 
 		}
 		
@@ -82,27 +86,30 @@ public class EmojiController extends BaseChatteController {
 		emojiView.getEngine().load(getClass().getResource("EmojiList.html").toExternalForm()); //$NON-NLS-1$
 		return window;
 	}
+	
+	@Override
+	public void handle(WebEvent<String> event) {
+		event.consume();
+		final String message = event.getData();
+		Platform.runLater(new Runnable () {
+			@Override
+			public void run() {
+				if(message.startsWith("chato:")) {
+					parentController.appendInputImage(message.substring(6));
+				} else {
+					parentController.appendEmoji(message);
+				}
 
-	static class StateChangeListener implements ChangeListener<State> {
-		final WebEngine engine;
-		final JavascritpAdapter app;
-		final ResourceManager resourceManager;
-		
-		public StateChangeListener(WebEngine engine, JavascritpAdapter app, ResourceManager resourceManager) {
-			this.engine = engine;
-			this.app = app;
-			this.resourceManager = resourceManager;
-		}
-		
-		@Override
-		public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
-			if (newState == State.SUCCEEDED) {
-				JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
-				htmlWindow.setMember("app", app); //$NON-NLS-1$
-				if(resourceManager != null) htmlWindow.call("loadResources", (Object) resourceManager.getResources()); //$NON-NLS-1$
 			}
-		}
+		});
+	}
 
+	@Override
+	public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
+		if (newState == State.SUCCEEDED) {
+			JSObject htmlWindow = (JSObject) gifsView.getEngine().executeScript("window"); //$NON-NLS-1$
+			htmlWindow.call("loadResources", (Object) resourceManager.getResources()); //$NON-NLS-1$
+		}
 	}
 	
 }

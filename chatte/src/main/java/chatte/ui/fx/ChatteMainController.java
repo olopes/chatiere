@@ -199,6 +199,9 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		// configure friend list
         listView.setCellFactory(new FriendCellFactory());
         List<Friend> knownFriends = configService.getKnownFriends();
+        configService.getSelf().setColor(UserColors.colors[0]);
+        listView.getItems().add(me);
+        currentColor=1;
         for(Friend f : knownFriends) {
         	f.setColor(UserColors.colors[currentColor]);
         	currentColor = (currentColor+1) % UserColors.colors.length;

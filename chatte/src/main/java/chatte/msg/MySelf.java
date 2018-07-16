@@ -24,8 +24,11 @@
  */
 package chatte.msg;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import chatte.net.ProxyMode;
 
+@XmlRootElement
 public class MySelf extends Friend {
 	private static final long serialVersionUID = 1L;
 

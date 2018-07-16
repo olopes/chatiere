@@ -26,14 +26,15 @@ package chatte.msg;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import chatte.ui.fx.Fx;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 
+@XmlRootElement
 public class Friend implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -41,11 +42,8 @@ public class Friend implements Serializable {
 	String host;
 	int port;
 	
-	@XmlTransient
 	transient ReadOnlyBooleanWrapper connectedProperty;
-	@XmlTransient
 	transient ReadOnlyStringWrapper nickProperty;
-	@XmlTransient
 	transient ReadOnlyStringWrapper colorProperty;
 
 	public Friend() {

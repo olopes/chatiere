@@ -92,6 +92,11 @@ img.img-list:hover {
 	cursor: pointer;
 }
 
+span.emoji {
+	display: inline-block;
+	width: 11pt;
+}
+
 div.emoji-list div {
 	font-size: 16pt;
 	font-weight: bold;
@@ -102,7 +107,6 @@ div.emoji-list div {
 div.emoji-list span.emoji {
 	display: inline-block;
 	padding: 5px;
-	width: 100px;
 	font-size: 20pt;
 	padding: 5px;
 	border: 1px solid #eeeeee;
