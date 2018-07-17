@@ -35,14 +35,16 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.web.PromptData;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import netscape.javascript.JSObject;
 
-public class EmojiController extends BaseChatteController implements EventHandler<WebEvent<String>>, ChangeListener<State> {
+public class EmojiController extends BaseChatteController implements EventHandler<WebEvent<String>>, Callback<PromptData, String> {
 	
 	@FXML Parent emojiSelectionPanel;
 	
@@ -73,8 +75,8 @@ public class EmojiController extends BaseChatteController implements EventHandle
 			
 			WebEngine gifEngine = gifsView.getEngine();
 			gifEngine.setOnAlert(this);
+			gifEngine.setPromptHandler(this);
 			gifEngine.setJavaScriptEnabled(true);
-			gifEngine.getLoadWorker().stateProperty().addListener(this);
 
 			WebEngine emoEngine = emojiView.getEngine();
 			emoEngine.setOnAlert(this);
@@ -103,13 +105,17 @@ public class EmojiController extends BaseChatteController implements EventHandle
 			}
 		});
 	}
-
-	@Override
-	public void changed(ObservableValue<? extends State> ov, State oldState, State newState) {
-		if (newState == State.SUCCEEDED) {
-			JSObject htmlWindow = (JSObject) gifsView.getEngine().executeScript("window"); //$NON-NLS-1$
-			htmlWindow.call("loadResources", (Object) resourceManager.getResources()); //$NON-NLS-1$
-		}
-	}
 	
+	@Override
+	public String call(PromptData param) {
+		String [] resources = resourceManager.getResources();
+		if(resources == null || resources.length == 0) return "";
+		// join strings
+		StringBuilder sb = new StringBuilder(41*resources.length); // SHA1 (40 chars) + 1 separator
+		for(String s : resources)
+			sb.append(s).append(',');
+		sb.setLength(sb.length()-1);
+		return sb.toString();
+	}
+
 }

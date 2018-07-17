@@ -30,6 +30,11 @@ SOFTWARE.
 <script type="text/javascript" src="ChatView.js"></script>
 <script type="text/javascript">
 	document.addEventListener('click', handleResourceClick, false);
+	document.addEventListener('DOMContentLoaded', function(event) { 
+		var resources = prompt('resources', ' ');
+		if(resources)
+			loadResources(resources.split(','));
+	});
 </script>
 </head>
 <body>

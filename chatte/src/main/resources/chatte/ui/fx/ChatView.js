@@ -53,9 +53,8 @@ function clearScreen() {
 }
 
 function appendImage(resource) {
-	var imgEl = document.createElement('IMG');
-	imgEl.src="chato:"+resource;
-	document.body.appendChild(imgEl);
+	var imgEl = createImageEl(resource);
+	appendChildAtCursor(imgEl);
 	return imgEl;
 }
 
@@ -63,17 +62,44 @@ function appendEmoji(emoji) {
 	var emoEl = document.createElement('SPAN');
 	emoEl.className='emoji';
 	emoEl.innerText = emoji;
-	document.body.appendChild(emoEl);
+	appendChildAtCursor(emoEl);
 	return emoEl;
+}
+
+function appendText(text) {
+	var node = document.createTextNode(text);
+	appendChildAtCursor(node);
+	return node;
+}
+
+function appendChildAtCursor(node) {
+    var range, node;
+    if(!node) return;
+    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount) {
+        range = window.getSelection().getRangeAt(0);
+        range.insertNode(node);
+       	range.setEndAfter(node);
+       	range.setStartAfter(node);
+    } else {
+    	document.body.appendChild(node);
+    }
 }
 
 function loadResources(resources) {
 	var img, i, onclick;
+	if(!resources) return;
 	for(i = 0; i < resources.length; i++) {
-		img = appendImage(resources[i]);
+		img = createImageEl(resources[i]);
 		img.className='img-list';
 		img.width = 100;
+		document.body.appendChild(img);
 	}
+}
+
+function createImageEl(resource) {
+	var imgEl = document.createElement('IMG');
+	imgEl.src="chato:"+resource;
+	return imgEl;
 }
 
 function handleEmojiClick (evt) {

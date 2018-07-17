@@ -48,4 +48,6 @@ public interface ResourceManager {
 
 	String[] getValidFileExtensions();
 
+	boolean isValidResourceFile(File f);
+
 }

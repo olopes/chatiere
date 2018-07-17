@@ -211,4 +211,14 @@ public class ChatoResourceManager implements ResourceManager {
 				};
 	}
 	
+	@Override
+	public boolean isValidResourceFile(File file) {
+		String name = file.getName().toLowerCase();
+		return file.isFile() && (
+				// TODO improve
+				name.endsWith(".gif")||
+				name.endsWith(".jpg")||
+				name.endsWith(".png")
+				);
+	}
 }

@@ -27,8 +27,11 @@ package chatte.ui.fx;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -313,7 +316,22 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	void doPasteImage(ActionEvent event) {
 		// mixing awt/swing/javafx... why? Why? WHY?
         Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+        if(transferable == null) return;
+        if(transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+			try {
+				@SuppressWarnings("unchecked")
+				List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+	        	if(files != null) {
+	        		for(File f : files) {
+	        			if(!resourceManager.isValidResourceFile(f)) continue;
+	        			String res = resourceManager.addResource(f);
+	        			appendInputImage(res);
+	        		}
+	        	}
+			} catch (UnsupportedFlavorException | IOException e) {
+        		log.log(Level.SEVERE, "Transfer files from clipboard failed", e);
+			}
+        } else if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
         	try {
         		java.awt.Image awtImage = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
     			java.awt.image.BufferedImage bufferedImage = null;
@@ -340,6 +358,20 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
         	} catch(Exception e) {
         		log.log(Level.SEVERE, "Error copying image from clipboard", e); //$NON-NLS-1$
         	}
+        } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        	String clipboardText = "";
+        	try (Reader reader = DataFlavor.getTextPlainUnicodeFlavor().getReaderForText(transferable)) {
+        		try (StringWriter sw = new StringWriter()) {
+        			char[] cbuf = new char[8192];
+        			int r = 0;
+        			while((r = reader.read(cbuf)) >= 0) 
+        				sw.write(cbuf, 0, r);
+        			clipboardText=sw.toString();
+        		}
+        	} catch(Exception e) {
+        		log.log(Level.SEVERE, "Could not transfer text from clipboard", e);
+        	}
+        	appendText(clipboardText);
 		}
 		inputArea.requestFocus();
 	}
@@ -385,6 +417,19 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
 		htmlWindow.call("appendImage", resourceCode); //$NON-NLS-1$
 	}
+	
+	public void appendEmoji(String emoji) {
+		WebEngine engine = inputArea.getEngine();
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("appendEmoji", emoji); //$NON-NLS-1$
+	}
+	
+	public void appendText(String text) {
+		WebEngine engine = inputArea.getEngine();
+		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
+		htmlWindow.call("appendText", text); //$NON-NLS-1$
+	}
+	
 	
 	public void messageTyped(TypedMessage msg) {
 		chatMessageReceived(new ChatMessage(msg));
@@ -471,10 +516,4 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		displayStatusMessage(message);
 	}
 
-	public void appendEmoji(String emoji) {
-		WebEngine engine = inputArea.getEngine();
-		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$
-		htmlWindow.call("appendEmoji", emoji); //$NON-NLS-1$
-	}
-	
 }
