@@ -59,9 +59,7 @@ function appendImage(resource) {
 }
 
 function appendEmoji(emoji) {
-	var emoEl = document.createElement('SPAN');
-	emoEl.className='emoji';
-	emoEl.innerText = emoji;
+	var emoEl = document.createTextNode(emoji);
 	appendChildAtCursor(emoEl);
 	return emoEl;
 }
@@ -73,13 +71,20 @@ function appendText(text) {
 }
 
 function appendChildAtCursor(node) {
-    var range, node;
+    var range, node, sel;
     if(!node) return;
-    if (window.getSelection && window.getSelection().getRangeAt && window.getSelection().rangeCount) {
-        range = window.getSelection().getRangeAt(0);
+    document.body.focus();
+    sel = window.getSelection();
+    if (sel.rangeCount) {
+        range = sel.getRangeAt(0);
         range.insertNode(node);
-       	range.setEndAfter(node);
+        
+        range = document.createRange();
+        range.selectNode(node);
        	range.setStartAfter(node);
+       	range.setEndAfter(node);
+        sel.removeAllRanges();
+        sel.addRange(range);
     } else {
     	document.body.appendChild(node);
     }

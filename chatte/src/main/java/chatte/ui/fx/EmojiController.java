@@ -28,9 +28,6 @@ import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker.State;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -39,10 +36,10 @@ import javafx.scene.web.PromptData;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
-import netscape.javascript.JSObject;
 
 public class EmojiController extends BaseChatteController implements EventHandler<WebEvent<String>>, Callback<PromptData, String> {
 	
@@ -69,7 +66,8 @@ public class EmojiController extends BaseChatteController implements EventHandle
 		if(window == null) {
 			parentController = (ChatteMainController) parent;
 			window = new Stage();
-			window.initOwner(window);
+			window.initOwner(parent.getWindow());
+			window.initModality(Modality.WINDOW_MODAL);
 			
 			window.setScene(new Scene(getRoot(), 640, 400));
 			
