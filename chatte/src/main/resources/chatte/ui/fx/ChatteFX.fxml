@@ -35,7 +35,8 @@ SOFTWARE.
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TabPane?>
 
-<BorderPane fx:id="chattefx" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatte.ui.fx.ChatteMainController">
+<BorderPane fx:id="chattefx" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+fx:controller="chatte.ui.fx.ChatteMainController" onDragDropped="#handleDrop" onDragOver="#handleDragOver" >
 <stylesheets>
 	<URL value="@ChatteFX.css" />
 </stylesheets>
@@ -66,10 +67,10 @@ SOFTWARE.
 				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list" />
 				<SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="472.0" prefWidth="474.0">
 					<items>
-						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" />
+						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" onDragDropped="#handleDrop"/>
 						<BorderPane minHeight="100.0" prefHeight="200.0" prefWidth="200.0">
 							<center>
-								<WebView fx:id="inputArea" onKeyPressed="#checkKeyPressed" prefHeight="200.0" prefWidth="506.0" BorderPane.alignment="CENTER" />
+								<WebView fx:id="inputArea" onKeyPressed="#checkKeyPressed" prefHeight="200.0" prefWidth="506.0" BorderPane.alignment="CENTER" onDragDropped="#handleDrop" />
 							</center>
 							<top>
 								<ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">

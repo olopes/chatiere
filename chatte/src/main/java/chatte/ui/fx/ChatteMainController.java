@@ -30,8 +30,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,13 +56,18 @@ import chatte.msg.TypedMessage;
 import chatte.msg.WelcomeMessage;
 import chatte.resources.ResourceManager;
 import chatte.ui.UserColors;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -321,59 +324,72 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 			try {
 				@SuppressWarnings("unchecked")
 				List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-	        	if(files != null) {
-	        		for(File f : files) {
-	        			if(!resourceManager.isValidResourceFile(f)) continue;
-	        			String res = resourceManager.addResource(f);
-	        			appendInputImage(res);
-	        		}
-	        	}
+				doPasteDropFiles(files);
 			} catch (UnsupportedFlavorException | IOException e) {
         		log.log(Level.SEVERE, "Transfer files from clipboard failed", e);
 			}
         } else if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-        	try {
+        	try  {
         		java.awt.Image awtImage = (java.awt.Image) transferable.getTransferData(DataFlavor.imageFlavor);
-    			java.awt.image.BufferedImage bufferedImage = null;
-        		if(awtImage instanceof java.awt.image.BufferedImage) {
-        			bufferedImage = (java.awt.image.BufferedImage) awtImage;
-        		} else {
-        			int w = awtImage.getWidth(null);
-        			int h = awtImage.getHeight(null);
-        			int type = java.awt.image.BufferedImage.TYPE_INT_RGB;  // other options
-        			bufferedImage = new java.awt.image.BufferedImage(w, h, type);
-        			java.awt.Graphics2D g2 = bufferedImage.createGraphics();
-        			g2.drawImage(awtImage, 0, 0, null);
-        			g2.dispose();
-        		}
-        		
-        		bufferedImage.flush();
-        		File tempFile = File.createTempFile("tmp_", ".png"); //$NON-NLS-1$ //$NON-NLS-2$
-        		ImageIO.write(bufferedImage, "png", tempFile); //$NON-NLS-1$
-        		String resource = resourceManager.addResource(tempFile);
-        		tempFile.delete();
-
-        		appendInputImage(resource);
-
-        	} catch(Exception e) {
-        		log.log(Level.SEVERE, "Error copying image from clipboard", e); //$NON-NLS-1$
-        	}
-        } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-        	String clipboardText = "";
-        	try (Reader reader = DataFlavor.getTextPlainUnicodeFlavor().getReaderForText(transferable)) {
-        		try (StringWriter sw = new StringWriter()) {
-        			char[] cbuf = new char[8192];
-        			int r = 0;
-        			while((r = reader.read(cbuf)) >= 0) 
-        				sw.write(cbuf, 0, r);
-        			clipboardText=sw.toString();
-        		}
+        		doPasteDropImage(awtImage);
         	} catch(Exception e) {
         		log.log(Level.SEVERE, "Could not transfer text from clipboard", e);
         	}
-        	appendText(clipboardText);
+        } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        	try  {
+        		String clipboardText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+        		doPasteDropString(clipboardText);
+        	} catch(Exception e) {
+        		log.log(Level.SEVERE, "Could not transfer text from clipboard", e);
+        	}
 		}
 		inputArea.requestFocus();
+	}
+	
+	void doPasteDropImage(java.awt.Image awtImage) {
+    	try {
+			java.awt.image.BufferedImage bufferedImage = null;
+    		if(awtImage instanceof java.awt.image.BufferedImage) {
+    			bufferedImage = (java.awt.image.BufferedImage) awtImage;
+    		} else {
+    			int w = awtImage.getWidth(null);
+    			int h = awtImage.getHeight(null);
+    			int type = java.awt.image.BufferedImage.TYPE_INT_RGB;  // other options
+    			bufferedImage = new java.awt.image.BufferedImage(w, h, type);
+    			java.awt.Graphics2D g2 = bufferedImage.createGraphics();
+    			g2.drawImage(awtImage, 0, 0, null);
+    			g2.dispose();
+    		}
+    		
+    		bufferedImage.flush();
+    		File tempFile = File.createTempFile("tmp_", ".png"); //$NON-NLS-1$ //$NON-NLS-2$
+    		ImageIO.write(bufferedImage, "png", tempFile); //$NON-NLS-1$
+    		String resource = resourceManager.addResource(tempFile);
+    		tempFile.delete();
+
+    		appendInputImage(resource);
+
+    	} catch(Exception e) {
+    		log.log(Level.SEVERE, "Error copying image from clipboard", e); //$NON-NLS-1$
+    	}
+
+	}
+	void doPasteDropImage(Image image) {
+		doPasteDropImage(SwingFXUtils.fromFXImage(image, null));
+	}
+	
+	void doPasteDropFiles(List<File> files) {
+    	if(files == null) return;
+
+		for(File f : files) {
+			if(!resourceManager.isValidResourceFile(f)) continue;
+			String res = resourceManager.addResource(f);
+			appendInputImage(res);
+		}
+	}
+	
+	void doPasteDropString(String str) {
+    	appendText(str);
 	}
 	
 	@FXML
@@ -412,6 +428,93 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		inputArea.requestFocus();
 	}
 	
+	@FXML
+	void handleDrop(DragEvent event) {
+		// Region target = (Region)event.getGestureTarget();
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if(db.hasFiles()) {
+        	log.fine("Paste files");
+        	doPasteDropFiles(db.getFiles());
+        	success=true;
+        } else if(db.hasImage()) {
+        	log.fine("Paste image");
+        	doPasteDropImage(db.getImage());
+        	success=true;
+        } else if(db.hasHtml()) {
+        	log.fine("Paste html");
+        	doPasteDropString(db.getHtml());
+        	success=true;
+        } else if(db.hasString()) {
+        	log.fine("Paste String");
+        	doPasteDropString(db.getString());
+        	success=true;
+        }
+
+//        if (db.hasString()) {
+//            dropped.setText(db.getString());
+//            success = true;
+//        }
+        /* let the source know whether the string was successfully 
+         * transferred and used */
+        event.setDropCompleted(success);
+        // target.getStyleClass().removeAll("drag-accept", "drag-reject");
+
+        event.consume();
+	}
+	
+	@FXML
+    void handleDragOver(DragEvent event) {
+        Dragboard db = event.getDragboard();
+        if (db.hasFiles()) {
+        	log.fine("Tem files");
+            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        } else if (db.hasImage()) {
+        	log.fine("Tem Image");
+        	event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        } else if (db.hasHtml()) {
+        	log.fine("Tem HTML");
+        	event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        } else if (db.hasString()) {
+        	log.fine("Tem String");
+        	event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+        }
+        event.consume();
+    }
+
+	
+	boolean acceptFiles(List<File> files) {
+		if(null == files || files.isEmpty()) return false;
+		for(File f : files) {
+			if(!resourceManager.isValidResourceFile(f))
+				return false;
+		}
+		return true;
+	}
+	
+//	@FXML
+//	void handleDragEnter(DragEvent event) {
+////		Region target = (Region)event.getGestureTarget();
+////        Dragboard db = event.getDragboard();
+////		if(db.hasImage())
+////			target.getStyleClass().add("drag-accept");
+////		else if(db.hasFiles() && acceptFiles(db.getFiles()))
+////			target.getStyleClass().add("drag-accept");
+////		else if(db.hasString())
+////			target.getStyleClass().add("drag-accept");
+////		else
+////			target.getStyleClass().add("drag-reject");
+////		
+////        event.consume();
+//	}
+//	
+//	@FXML
+//	void handleDragExit(DragEvent event) {
+////		Region target = (Region)event.getGestureTarget();
+////		target.getStyleClass().removeAll("drag-accept", "drag-reject");
+////		event.consume();
+//	}
+//	
 	public void appendInputImage(String resourceCode) {
 		WebEngine engine = inputArea.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$

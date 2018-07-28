@@ -128,5 +128,11 @@ function doSelectEmoji(element) {
 	alert(element.innerText);
 }
 
-
+function killDragDropEvent(e) {
+	e = e || event;
+	e.preventDefault();
+	return false;
+}
+window.addEventListener("dragover",killDragDropEvent,false);
+window.addEventListener("drop",killDragDropEvent,false);
 
