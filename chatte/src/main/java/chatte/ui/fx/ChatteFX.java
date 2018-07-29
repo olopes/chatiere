@@ -124,7 +124,7 @@ public class ChatteFX extends Application {
 		// start network listener
 		// new Thread(new chatte.net.MsgListener(messageBroker, configService), "MsgListener").start();
 		
-		controllerFactory = new ControllerFactory(configService, resourceManager, messageBroker);
+		controllerFactory = new ControllerFactory(configService, resourceManager, messageBroker, this);
 		
 		// register "custom" font
 		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12); //$NON-NLS-1$

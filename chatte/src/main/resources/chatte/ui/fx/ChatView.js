@@ -91,7 +91,7 @@ function appendChildAtCursor(node) {
 }
 
 function loadResources(resources) {
-	var img, i, onclick;
+	var img, i;
 	if(!resources) return;
 	for(i = 0; i < resources.length; i++) {
 		img = createImageEl(resources[i]);
@@ -136,3 +136,13 @@ function killDragDropEvent(e) {
 window.addEventListener("dragover",killDragDropEvent,false);
 window.addEventListener("drop",killDragDropEvent,false);
 
+// handle captured click events
+function handleHyperlinkClick(e) {
+	var el = e.target;
+	while (el){
+		if (el.tagName === 'A'){
+			return confirm(el.href);
+		}
+		el = el.parentNode;
+	}
+}

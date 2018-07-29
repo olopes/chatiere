@@ -27,23 +27,33 @@ package chatte.ui.fx;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
 import chatte.resources.ResourceManager;
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.util.Callback;
 
 public class ControllerFactory implements Callback<Class<?>, Object> {
+	final Logger log;
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
 
 	MessageBroker messageBroker;
 	ResourceManager resourceManager;
 	ConfigService configService;
+	Application application;
 
-	public ControllerFactory(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+	public ControllerFactory(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker, Application application) {
 		this.messageBroker = messageBroker;
-		this.resourceManager=resourceManager;
-		this.configService=configService;
+		this.resourceManager = resourceManager;
+		this.configService = configService;
+		this.application = application;
+		this.log = getLogger();
 	}
 
 	@Override
@@ -51,15 +61,20 @@ public class ControllerFactory implements Callback<Class<?>, Object> {
 		Object instance = null;
 		try {
 			try {
-				Constructor<?> const1 = clazz.getConstructor(ConfigService.class, ResourceManager.class, MessageBroker.class);
-				instance = const1.newInstance(configService, resourceManager, messageBroker);
-			} catch (NoSuchMethodException e) {
-				instance = clazz.newInstance();
+				Constructor<?> const1 = clazz.getConstructor(ConfigService.class, ResourceManager.class, MessageBroker.class, Application.class);
+				instance = const1.newInstance(configService, resourceManager, messageBroker, application);
+			} catch (NoSuchMethodException e1) {
+				try {
+					Constructor<?> const1 = clazz.getConstructor(ConfigService.class, ResourceManager.class, MessageBroker.class);
+					instance = const1.newInstance(configService, resourceManager, messageBroker);
+				} catch (NoSuchMethodException e2) {
+					instance = clazz.newInstance();
+				}
 			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+				| InvocationTargetException ex) {
+			log.log(Level.SEVERE, "Could not create the new Controller instance", ex);
+			throw new RuntimeException(ex);
 		}
 		
 		// Try to inject factory class
@@ -73,8 +88,8 @@ public class ControllerFactory implements Callback<Class<?>, Object> {
 					fld.set(instance, this);
 					break;
 				} catch (IllegalArgumentException | IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.log(Level.SEVERE, "Could not inject controller factory into new controller instance", e);
+					throw new RuntimeException(e);
 				}
 			}
 		}

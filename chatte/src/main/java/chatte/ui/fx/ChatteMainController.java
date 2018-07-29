@@ -56,6 +56,8 @@ import chatte.msg.TypedMessage;
 import chatte.msg.WelcomeMessage;
 import chatte.resources.ResourceManager;
 import chatte.ui.UserColors;
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -78,9 +80,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import netscape.javascript.JSObject;
 
-public class ChatteMainController implements Initializable, ChatteContext, ChatteController {
+public class ChatteMainController implements Initializable, ChatteContext, ChatteController, Callback<String,Boolean> {
 	// components injected by FXML
 	@FXML BorderPane chattefx;
 	
@@ -107,6 +110,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 
 	
 	// class specific stuff
+	ChatteFX application;
 	Stage window;
 	ResourceBundle bundle;
 	Friend me;
@@ -125,7 +129,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		return Logger.getLogger(getClass().getName());
 	}
 
-	public ChatteMainController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
+	public ChatteMainController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker, Application application) {
+		this.application = (ChatteFX)application;
 		this.messageBroker=messageBroker;
 		this.resourceManager = resourceManager;
 		this.history = new HistoryLoggerImpl(messageBroker, configService, resourceManager);
@@ -180,7 +185,19 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		return window;
 	}
 
+	@Override
+	public Boolean call(String url) {
+		log.fine("Open URL with external browser: "+url);
+		doOpenURLWithBrowser(url);
+		// Always return false because the confirm handler is used to open links on click.
+		return false;
+	}
+	
 	void setupWindows(Stage mainWindow) {
+		
+		webView.getEngine().setConfirmHandler(this);
+		inputArea.getEngine().setConfirmHandler(this);
+		
 		this.window = mainWindow;
 		ChatteControllerManager manager = new ChatteControllerManager(controllerFactory);
 		// create notification popup
@@ -228,6 +245,17 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 
 	}
 
+	void doOpenURLWithBrowser(final String url) {
+		log.fine("Open URL with external browser: "+url);
+		// they say this might prevent JVM crashes?
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				application.getHostServices().showDocument(url);
+			}
+		});
+	}
+	
 	void doSendMessage() {
 		WebEngine engine = inputArea.getEngine();
 		JSObject inputContents = (JSObject) engine.executeScript("getInputContents()"); //$NON-NLS-1$
