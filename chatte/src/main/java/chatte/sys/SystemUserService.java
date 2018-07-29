@@ -2,94 +2,47 @@ package chatte.sys;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileOwnerAttributeView;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.Arrays;
 
-public class SystemUserService {
+public abstract class SystemUserService {
 
-	private Object system;
-
-	public SystemUserService() {
+	public static SystemUserService getDefault() {
 		try {
-			system = Class.forName("com.sun.security.auth.module.NTSystem").newInstance();
-		} catch(Exception ntEx) {
+			return new NTUserService();
+		} catch (SystemUserException e) {
 			try {
-				system = Class.forName("com.sun.security.auth.module.UnixSystem").newInstance();
-			} catch(Exception uxEx) {
-				try {
-					system = Class.forName("com.sun.security.auth.module.SolarisSystem").newInstance();
-				} catch(Exception slEx) {
-					// throw new RuntimeException("System not found");
-					system = null;
-				}
+				return new UnixUserService();
+			} catch (SystemUserException e1) {
+				return new SystemUserService() {
+				};
 			}
 		}
 	}
-	
-	public String getUsername() {
-		if(system != null) {
-			try {
-				return (String) system.getClass().getMethod("getName").invoke(system);
-			} catch (Exception e) {
-				try {
-					return (String) system.getClass().getMethod("getUsername").invoke(system);
-				} catch (Exception e1) {
 
-				}
-			}
-		}
+	public SystemUserService() {
+	}
+
+	public String getUsername() {
 		return System.getProperty("user.name");
 	}
 
 	public String getUserId() {
-		if(system != null) {
-			try {
-				return (String) system.getClass().getMethod("getUserSID").invoke(system);
-			} catch (Exception e) {
-				try {
-					return String.valueOf(system.getClass().getMethod("getUid").invoke(system));
-				} catch (Exception e1) {
-
-				}
-			}
-		}
 		return null;
 	}
 
 	public String getGroupId() {
-		if(system != null) {
-			try {
-				return (String) system.getClass().getMethod("getPrimaryGroupID").invoke(system);
-			} catch (Exception e) {
-				try {
-					return String.valueOf(system.getClass().getMethod("getGid").invoke(system));
-				} catch (Exception e1) {
-
-				}
-			}
-		}
 		return null;
 	}
 
-	public String [] getUserGroups() {
-		if(system != null) {
-			try {
-				return (String[]) system.getClass().getMethod("getGroupIDs").invoke(system);
-			} catch (Exception e) {
-				try {
-					long [] groups = (long[]) system.getClass().getMethod("getGroups").invoke(system);
-					String [] result = new String[groups.length];
-					for(int i = 0; i<groups.length; i++)
-						result[i]=String.valueOf(groups[i]);
-					return result;
-				} catch (Exception e1) {
-
-				}
-			}
-		}
+	public String[] getUserGroups() {
 		return null;
 	}
-	
+
 	public UserPrincipal getUserPrincipal() {
 		try {
 			return FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(getUsername());
@@ -97,14 +50,51 @@ public class SystemUserService {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public static void main(String[] args) {
-		SystemUserService sus = new SystemUserService();
-		System.out.println("User: "+sus.getUsername());
-		System.out.println("UID: "+sus.getUserId());
-		System.out.println("GID: "+sus.getGroupId());
-		System.out.println("groups: "+Arrays.toString(sus.getUserGroups()));
-		System.out.println("Principal: "+sus.getUserPrincipal());
+
+	// boolean or exception?
+	public synchronized boolean createSecureFile(String pathName) {
+		return createSecureFile(Paths.get(pathName));
+	}
+
+	public synchronized boolean createSecureFile(Path path) {
+		try {
+			path.toFile().createNewFile();
+			FileOwnerAttributeView ownerView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+			ownerView.setOwner(getUserPrincipal());
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	public synchronized boolean isFileSecure(String pathName) {
+		return isFileSecure(Paths.get(pathName));
+	}
+
+	public synchronized boolean isFileSecure(Path path) {
+		try {
+			FileOwnerAttributeView userView = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+
+			UserPrincipal owner = userView.getOwner();
+			return owner.getName().equals(getUsername());
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		SystemUserService sus = SystemUserService.getDefault();
+		System.out.println("User: " + sus.getUsername());
+		System.out.println("UID: " + sus.getUserId());
+		System.out.println("GID: " + sus.getGroupId());
+		System.out.println("groups: " + Arrays.toString(sus.getUserGroups()));
+		System.out.println("Principal: " + sus.getUserPrincipal());
+
+		System.out.println("Is secured: "+sus.isFileSecure("test.secu"));
+		System.out.println("Create secure: "+sus.createSecureFile("test.secu"));
+		System.out.println("Is secured: "+sus.isFileSecure("test.secu"));
+		System.out.println("Not secured: "+sus.isFileSecure("pom.xml"));
+		// Files.delete(Paths.get("test.secu"));
 	}
 
 }
