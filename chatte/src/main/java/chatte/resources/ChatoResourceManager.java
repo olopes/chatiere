@@ -123,15 +123,16 @@ public class ChatoResourceManager implements ResourceManager {
 				while((r = in.read(b))>=0)
 					crypt.update(b, 0, r);
 			}
-			String sha1 = byteToHex(crypt.digest());
-
-			// filename = sha1+extension
-			String name = toAdd.getName().toLowerCase();
-			name = name.substring(name.lastIndexOf('.'));
-			File dest = new File(resourceFolder, sha1+name);
-
-			Files.copy(toAdd.toPath(), dest.toPath());
-			return sha1;
+			String resourceCode = byteToHex(crypt.digest());
+			
+			if(!resourceExist(resourceCode)) {
+				// filename = sha1+extension
+				String name = toAdd.getName().toLowerCase();
+				String extension = name.substring(name.lastIndexOf('.'));
+				File dest = new File(resourceFolder, resourceCode+extension);
+				Files.copy(toAdd.toPath(), dest.toPath());
+			}
+			return resourceCode;
 		} catch(Exception e) {
 			log.log(Level.SEVERE, "Error adding new resource", e); //$NON-NLS-1$
 		}
