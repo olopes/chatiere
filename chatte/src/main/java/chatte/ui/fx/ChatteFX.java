@@ -40,7 +40,10 @@ import chatte.msg.ChatoMessageBroker;
 import chatte.msg.MessageBroker;
 import chatte.msg.StopServicesMessage;
 import chatte.net.ChatoProxySelector;
+import chatte.net.ChatoSecureSocketService;
 import chatte.net.ChatoURLStreamHandlerFactory;
+import chatte.net.SecureSocketService;
+import chatte.net.SecureSocketServiceException;
 import chatte.plugin.ChattePluginLoader;
 import chatte.resources.ChatoResourceManager;
 import chatte.resources.ResourceManager;
@@ -130,33 +133,6 @@ public class ChatteFX extends Application {
 		Font.loadFont(getClass().getResource("OpenSansEmoji.ttf").toExternalForm(), 12); //$NON-NLS-1$
 	}
 
-    private boolean setStorePassword(final String password) {
-    	passwordSet = isGoodPassword("ssl.key", password); //$NON-NLS-1$
-		// Configure SSL context
-		System.setProperty("javax.net.ssl.keyStore","ssl.key"); //$NON-NLS-1$ //$NON-NLS-2$
-		// System.setProperty("javax.net.ssl.keyStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.keyStorePassword",password); //$NON-NLS-1$
-		System.setProperty("javax.net.ssl.trustStore","ssl.key"); //$NON-NLS-1$ //$NON-NLS-2$
-		// System.setProperty("javax.net.ssl.trustStorePassword","ssl.key");
-		System.setProperty("javax.net.ssl.trustStorePassword",password); //$NON-NLS-1$
-        log.info("Key configured!"); //$NON-NLS-1$
-        return passwordSet;
-    }
-
-	
-	private boolean isGoodPassword(String storeFile, String password) {
-		try (FileInputStream in = new FileInputStream(storeFile)){
-			KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-			store.load(in, password.toCharArray());
-			log.info("KeyStore successfuly loaded"); //$NON-NLS-1$
-			return true;
-		} catch(Exception e) {
-			log.info("Bad password"); //$NON-NLS-1$
-		}
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
 		
@@ -236,23 +212,24 @@ public class ChatteFX extends Application {
         button.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent t) {
                 // Save credentials
-                String password = passwordBox.getText();
+                char[] password = passwordBox.getText().toCharArray();
                 // Do not allow any further edits
                 passwordBox.setEditable(false);
                 button.setDisable(true);
                 
-                if(setStorePassword(password)) {
-                	new chatte.net.MsgListener(messageBroker, configService);
+                try {
+                	SecureSocketService sockService = new ChatoSecureSocketService(password);
+                	new chatte.net.MsgListener(messageBroker, configService, sockService);
                 	log.info("Good password :-)"); //$NON-NLS-1$
-                    // Hide if app is ready
-                    stage.close();
-                } else {
+                	passwordSet=true;
+                	stage.close();
+                } catch (SecureSocketServiceException e) {
                 	log.log(Level.SEVERE, "BAD PASSWORD!"); //$NON-NLS-1$
                 	// enable edits and show 
+                	passwordBox.setText("");
                     passwordBox.setEditable(true);
                     button.setDisable(false);
                 }
-                
             }
         });
         HBox buttonHolder = new HBox();

@@ -1,4 +1,4 @@
-package chatte;
+package chatte.nonunit;
 
 import java.io.BufferedReader;
 import java.io.File;

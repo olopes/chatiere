@@ -107,6 +107,7 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	NotifController notifPopupController;
 	AlertController alertController;
 	EmojiController emojiController;
+	StorePasswordController passwordController;
 
 	
 	// class specific stuff

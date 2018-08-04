@@ -41,8 +41,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocketFactory;
 
 import chatte.config.ConfigService;
 import chatte.msg.ConnectedMessage;
@@ -59,6 +57,7 @@ public class MsgListener implements Runnable {
 	
 	MessageBroker messageBroker;
 	ConfigService configService;
+	SecureSocketService socketService;
 	boolean running = true;
 	Set<Friend> connectedFriends;
 	Deque<Friend> connectingFriends;
@@ -85,9 +84,10 @@ public class MsgListener implements Runnable {
 		}
 	}
 	
-	public MsgListener(MessageBroker messageBroker, ConfigService configService) {
+	public MsgListener(MessageBroker messageBroker, ConfigService configService, SecureSocketService socketService) {
 		this.messageBroker = messageBroker;
 		this.configService = configService;
+		this.socketService=socketService;
 		this.connectedFriends = new HashSet<>();
 		this.connectingFriends = new LinkedList<>();
 		this.localAddresses = new HashSet<>();
@@ -146,7 +146,7 @@ public class MsgListener implements Runnable {
 		connectingFriends.addAll(configService.getKnownFriends());
 
 		// listen for connections
-		ServerSocketFactory factory = SSLServerSocketFactory.getDefault();
+		ServerSocketFactory factory = socketService.newServerSocketFactory(); //SSLServerSocketFactory.getDefault();
 		try (ServerSocket server = factory.createServerSocket(getPort())) {
 			server.setSoTimeout(60000);
 			this.serverSocket = server;
@@ -241,8 +241,7 @@ public class MsgListener implements Runnable {
 		
 		connectedFriends.add(friend);
 		try {
-			
-			Socket socket = SSLSocketFactory.getDefault().createSocket();
+			Socket socket = socketService.newSocketFactory().createSocket();// SSLSocketFactory.getDefault().createSocket();
 			socket.connect(InetSocketAddress.createUnresolved(friend.getHost(), friend.getPort()), 10000);
 			MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 			Thread workerThread = new Thread(newWorker,"net client "+socket.getInetAddress()); //$NON-NLS-1$

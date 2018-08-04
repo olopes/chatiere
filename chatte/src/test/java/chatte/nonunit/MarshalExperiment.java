@@ -1,4 +1,4 @@
-package chatte;
+package chatte.nonunit;
 
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import chatte.msg.ChatMessage;
 import chatte.msg.Friend;
 import chatte.msg.WelcomeMessage;
 
-public class TestMarshal {
+public class MarshalExperiment {
 	private static String marshalingExample(AbstractMessage message) throws JAXBException
 	{
 	    JAXBContext jaxbContext = JAXBContext.newInstance(message.getClass());
