@@ -85,5 +85,4 @@ public abstract class BaseChatteController implements Initializable, ChatteContr
 		((Stage)createWindow(owner)).show();
 	}
 
-
 }

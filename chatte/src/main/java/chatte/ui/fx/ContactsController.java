@@ -24,19 +24,25 @@
  */
 package chatte.ui.fx;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import chatte.config.ConfigService;
 import chatte.msg.Friend;
 import chatte.msg.MessageBroker;
 import chatte.msg.NewFriendMessage;
 import chatte.resources.ResourceManager;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class ContactsController extends BaseChatteController {
+public class ContactsController extends BaseChatteController implements ChangeListener<String> {
 	
 	@FXML VBox contactsPanel;
 	@FXML TextField nick;
@@ -45,24 +51,57 @@ public class ContactsController extends BaseChatteController {
 	
 	@FXML Button okButton;
 
+	boolean approved;
+	Friend friend;
+	
 	public ContactsController(ConfigService configService, ResourceManager resourceManager, MessageBroker messageBroker) {
 		super(configService, resourceManager, messageBroker);
 	}
+	
+	@Override
+	public void initialize(URL baseURL, ResourceBundle bundle) {
+		super.initialize(baseURL, bundle);
+		port.textProperty().addListener(this);
+	}
 
 	@FXML 
-	void doConnect(ActionEvent event) {
-		log.fine("Window close request"); //$NON-NLS-1$
+	void onOkButton(ActionEvent event) {
+		log.fine("Ok Button clicked"); //$NON-NLS-1$
 		Friend friend = new Friend();
 		friend.setNick(nick.getText());
 		friend.setHost(host.getText());
 		friend.setPort(Integer.parseInt(port.getText()));
 		configService.addFriend(friend);
 		messageBroker.sendMessage(new NewFriendMessage(friend));
+		Stage stage = (Stage)contactsPanel.getScene().getWindow();
+		stage.close();
 	}
 
 	@Override
 	public Parent getRoot() {
 		return contactsPanel;
+	}
+
+	@Override
+	public void showWindow(ChatteController owner) {
+		showWindow(owner, null);
+	}
+	
+	public void showWindow(ChatteController owner, Friend friend) {
+		if(friend != null) {
+			// modification mode
+			nick.setText(friend.getNick());
+			host.setText(friend.getHost());
+			port.setText(String.valueOf(friend.getPort()));
+		}
+		super.showWindow(owner);
+	}
+	
+	@Override
+	public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+		if (!newValue.matches("\\d*")) { //$NON-NLS-1$
+			port.setText(newValue.replaceAll("[^\\d]", "")); //$NON-NLS-1$  $NON-NLS-2$
+		}
 	}
 
 

@@ -242,7 +242,7 @@ public class MsgListener implements Runnable {
 		connectedFriends.add(friend);
 		try {
 			Socket socket = socketService.newSocketFactory().createSocket();// SSLSocketFactory.getDefault().createSocket();
-			socket.connect(InetSocketAddress.createUnresolved(friend.getHost(), friend.getPort()), 10000);
+			socket.connect(new InetSocketAddress(friend.getHost(), friend.getPort()), 10000);
 			MsgWorker newWorker = new MsgWorker(friend, messageBroker, this, socket);
 			Thread workerThread = new Thread(newWorker,"net client "+socket.getInetAddress()); //$NON-NLS-1$
 			workerThread.start();
