@@ -26,6 +26,8 @@ package chatte.net;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,10 +48,13 @@ import chatte.msg.TypedMessage;
 import chatte.msg.WelcomeMessage;
 
 public class NetCodec {
-	private static Logger log = Logger.getLogger(NetCodec.class.getName());
-	static final JAXBContext jaxbContext;
-
-	static {
+	private Logger log = Logger.getLogger(NetCodec.class.getName());
+	
+	JAXBContext jaxbContext;
+	MessageBroker messageBroker;
+	
+	public NetCodec(MessageBroker messageBroker) {
+		this.messageBroker = messageBroker;
 		try {
 			jaxbContext = JAXBContext.newInstance(
 					WelcomeMessage.class,
@@ -62,13 +67,13 @@ public class NetCodec {
 		}
 	}
 	
-	static byte[] marshalMessage(AbstractMessage message) {
+	
+	byte[] marshalMessage(AbstractMessage message) {
 		try {
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			// force UTF-8
 			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8"); //$NON-NLS-1$
-			// jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			jaxbMarshaller.marshal(message, output);
 			return output.toByteArray();
@@ -78,29 +83,21 @@ public class NetCodec {
 		return null;
 	}
 	
-	static AbstractMessage unmarshalMessage(byte [] contents) {
+	AbstractMessage unmarshalMessage(byte [] contents) {
 		AbstractMessage message = null;
 		try {
 			Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
-			// force UTF-8
-			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8"); //$NON-NLS-1$
-			// jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
 			ByteArrayInputStream input = new ByteArrayInputStream(contents);
-			message = (AbstractMessage)jaxbMarshaller.unmarshal(input);
+			InputStreamReader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
+			message = (AbstractMessage)jaxbMarshaller.unmarshal(reader);
 		} catch(Exception e) {
 			log.log(Level.SEVERE, "Something bad happened", e); //$NON-NLS-1$
 		}
 		return message;
 	}
 	
-	static OutboundMessage convertMessage(AbstractMessage message) {
+	OutboundMessage convertMessage(AbstractMessage message) {
 		return new OutboundMessage(marshalMessage(message));
-	}
-	
-	MessageBroker messageBroker;
-	public NetCodec(MessageBroker messageBroker) {
-		this.messageBroker = messageBroker;
 	}
 	
 	// message received

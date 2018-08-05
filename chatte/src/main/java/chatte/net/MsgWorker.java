@@ -106,7 +106,7 @@ public class MsgWorker implements Runnable {
 			welcome.setPort(server.getPort()); // from config
 			welcome.setKnownFriends(server.getConnectedFriends());
 			log.info("1. Welcome message ready"); //$NON-NLS-1$
-			sendOutboundMessage(NetCodec.convertMessage(welcome));
+			// sendOutboundMessage(NetCodec.convertMessage(welcome));
 
 			log.info("2. Welcome message sent"); //$NON-NLS-1$
 			

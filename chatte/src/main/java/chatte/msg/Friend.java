@@ -27,6 +27,7 @@ package chatte.msg;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import chatte.ui.fx.Fx;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -58,7 +59,7 @@ public class Friend implements Serializable {
 
 	public void setNick(String nick) {
 		this.nick = nick;
-		Fx.setInFxThread(this.nickProperty, nick);
+		// Fx.setInFxThread(this.nickProperty, nick);
 	}
 
 	public String getHost() {
@@ -77,6 +78,7 @@ public class Friend implements Serializable {
 		this.port = port;
 	}
 
+	@XmlTransient
 	public boolean isConnected() {
 		return connectedProperty.get();
 	}
@@ -85,6 +87,7 @@ public class Friend implements Serializable {
 		Fx.setInFxThread(this.connectedProperty, connected);
 	}
 	
+	@XmlTransient
 	public String getColor() {
 		return this.colorProperty.get();
 	}
