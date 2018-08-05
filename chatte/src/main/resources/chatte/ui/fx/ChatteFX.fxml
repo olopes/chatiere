@@ -53,6 +53,13 @@ fx:controller="chatte.ui.fx.ChatteMainController" onDragDropped="#handleDrop" on
 						<MenuItem mnemonicParsing="false" onAction="#doPasteImage" text="%menuitem.paste" />
 					</items>
 				</Menu>
+				<Menu mnemonicParsing="false" text="%menu.contacts">
+					<items>
+						<MenuItem mnemonicParsing="false" onAction="#doAddNewFriend" text="%menuitem.addNewFriend" fx:id="addNewFriendMenu" />
+						<MenuItem mnemonicParsing="false" onAction="#doModifyFriend" text="%menuitem.modifyFriend" fx:id="modifyFriendMenu" disable="true" />
+						<MenuItem mnemonicParsing="false" onAction="#doRemoveFriend" text="%menuitem.removeFriend" fx:id="removeFriendMenu" disable="true" />
+					</items>
+				</Menu>
 				<Menu mnemonicParsing="false" text="%menu.help">
 					<items>
 						<MenuItem mnemonicParsing="false" text="%menuitem.about" />
@@ -64,7 +71,7 @@ fx:controller="chatte.ui.fx.ChatteMainController" onDragDropped="#handleDrop" on
 	<center>
 		<SplitPane dividerPositions="0.2" prefHeight="200.0" prefWidth="200.0">
 			<items>
-				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list" onContextMenuRequested="#onListViewContextMenu" />
+				<ListView fx:id="listView" prefHeight="398.0" prefWidth="96.0" styleClass="user-list" />
 				<SplitPane dividerPositions="0.8" orientation="VERTICAL" prefHeight="472.0" prefWidth="474.0">
 					<items>
 						<WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" onDragDropped="#handleDrop"/>

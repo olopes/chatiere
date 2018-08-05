@@ -58,6 +58,8 @@ import chatte.resources.ResourceManager;
 import chatte.ui.UserColors;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -67,6 +69,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DragEvent;
@@ -96,6 +99,10 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	@FXML WebView webView;
 	@FXML WebView inputArea;
 
+    // from the menubar
+    @FXML MenuItem addNewFriendMenu;
+    @FXML MenuItem removeFriendMenu;
+    @FXML MenuItem modifyFriendMenu;
 	// context menu for the listview
     MenuItem addNewFriend, modifyFriend, removeFriend;
 
@@ -235,10 +242,21 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
         	f.setColor(UserColors.colors[currentColor]);
         	currentColor = (currentColor+1) % UserColors.colors.length;
         }
+        listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Friend>() {
+        	@Override
+        	public void changed(ObservableValue<? extends Friend> observable, Friend oldValue, Friend newValue) {
+        		boolean disableDependents = (newValue == null || newValue.isMyself());
+        		removeFriend.setDisable(disableDependents);
+        		modifyFriend.setDisable(disableDependents);
+        		removeFriendMenu.setDisable(disableDependents);
+        		modifyFriendMenu.setDisable(disableDependents);
+        	}
+		});
         listView.getItems().addAll(knownFriends);
-        
+
         addNewFriend = new MenuItem();
-        addNewFriend.setText(resources.getString("menuitem.addFriend"));
+        addNewFriend.setText(resources.getString("menuitem.addNewFriend"));
         addNewFriend.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -342,16 +360,6 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	// Toolbar button actions
 	
 	@FXML
-	void onListViewContextMenu(ContextMenuEvent event) {
-		Friend selected = listView.getSelectionModel().getSelectedItem();
-		boolean disableDependents = (selected == null || selected.isMyself());
-		removeFriend.setDisable(disableDependents);
-		modifyFriend.setDisable(disableDependents);
-		// do not consume the event and allow propagation
-	}
-	
-	
-	@FXML
 	void doAddNewFriend(ActionEvent event) {
 		contactPanelController.showWindow(getMainController());
 	}
@@ -368,19 +376,8 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		Friend selected = listView.getSelectionModel().getSelectedItem();
 		if(selected == null || selected.isMyself()) return;
 		
-		
-		
-	}
-	
-	@FXML
-	void doRemoveContact(ActionEvent event) {
-		List<Friend> selected = new ArrayList<>(listView.getSelectionModel().getSelectedItems());
-		for(Friend friend : selected) {
-			if(friend == me) continue;
-			configService.removeFriend(friend);
-			listView.getItems().remove(friend);
-		}
-		
+		configService.removeFriend(selected);
+		listView.getItems().remove(selected);
 		listView.getSelectionModel().clearSelection();
 	}
 	
