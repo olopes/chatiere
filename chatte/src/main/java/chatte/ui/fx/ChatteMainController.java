@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -71,7 +70,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.image.Image;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -338,6 +336,12 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 	
 	// Menu actions
 	
+	@FXML
+	void doOpenHistory(ActionEvent event) {
+		// open conversation history in browser
+		doOpenURLWithBrowser(history.getServiceUrl());
+	}
+	
 	@FXML 
 	void doExit(ActionEvent event) {
 		log.fine("Window close request"); //$NON-NLS-1$
@@ -581,29 +585,6 @@ public class ChatteMainController implements Initializable, ChatteContext, Chatt
 		return true;
 	}
 	
-//	@FXML
-//	void handleDragEnter(DragEvent event) {
-////		Region target = (Region)event.getGestureTarget();
-////        Dragboard db = event.getDragboard();
-////		if(db.hasImage())
-////			target.getStyleClass().add("drag-accept");
-////		else if(db.hasFiles() && acceptFiles(db.getFiles()))
-////			target.getStyleClass().add("drag-accept");
-////		else if(db.hasString())
-////			target.getStyleClass().add("drag-accept");
-////		else
-////			target.getStyleClass().add("drag-reject");
-////		
-////        event.consume();
-//	}
-//	
-//	@FXML
-//	void handleDragExit(DragEvent event) {
-////		Region target = (Region)event.getGestureTarget();
-////		target.getStyleClass().removeAll("drag-accept", "drag-reject");
-////		event.consume();
-//	}
-//	
 	public void appendInputImage(String resourceCode) {
 		WebEngine engine = inputArea.getEngine();
 		JSObject htmlWindow = (JSObject) engine.executeScript("window"); //$NON-NLS-1$

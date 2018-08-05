@@ -34,6 +34,7 @@ SOFTWARE.
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 
 <BorderPane fx:id="chattefx" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="481.0" prefWidth="855.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
 fx:controller="chatte.ui.fx.ChatteMainController" onDragDropped="#handleDrop" onDragOver="#handleDragOver" >
@@ -45,6 +46,8 @@ fx:controller="chatte.ui.fx.ChatteMainController" onDragDropped="#handleDrop" on
 			<menus>
 				<Menu mnemonicParsing="false" text="%menu.file">
 					<items>
+						<MenuItem mnemonicParsing="false" onAction="#doOpenHistory" text="%menuitem.history" />
+						<SeparatorMenuItem />
 						<MenuItem mnemonicParsing="false" onAction="#doExit" text="%menuitem.close" />
 					</items>
 				</Menu>

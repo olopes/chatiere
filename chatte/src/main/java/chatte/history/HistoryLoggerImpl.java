@@ -36,6 +36,7 @@ import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import chatte.config.ConfigService;
 import chatte.msg.MessageBroker;
@@ -44,12 +45,22 @@ import chatte.msg.StopServicesMessage;
 import chatte.resources.ResourceManager;
 
 public class HistoryLoggerImpl implements HistoryLogger {
+	private Logger log = getLogger();
+	Logger getLogger() {
+		return Logger.getLogger(getClass().getName());
+	}
+
 
 	PrintWriter writer;
 	ResourceManager resourceManager;
+	HttpService httpService;
+	String serviceUrl;
 	
 	public HistoryLoggerImpl(MessageBroker messageBroker, ConfigService configService, ResourceManager resourceManager) {
 		this.resourceManager = resourceManager;
+		httpService = new HttpService(resourceManager);
+		serviceUrl = "http://localhost:"+httpService.getHttpPort()+"/";
+		log.info("Chat history URL: "+serviceUrl);
 		this.writer = new PrintWriter(new Writer() {
 			@Override
 			public void write(char[] cbuf, int off, int len) throws IOException {
@@ -61,8 +72,14 @@ public class HistoryLoggerImpl implements HistoryLogger {
 			public void close() throws IOException {
 			}
 		});
+		
 		setupHistoryFile(configService);
 		messageBroker.addListener(this);
+	}
+	
+	@Override
+	public String getServiceUrl() {
+		return serviceUrl;
 	}
 	
 	private void setupHistoryFile(ConfigService configService) {
@@ -76,27 +93,27 @@ public class HistoryLoggerImpl implements HistoryLogger {
 			if(!Files.exists(hist.resolve("OpenSansEmoji.ttf"))) { //$NON-NLS-1$
 				Files.copy(getClass().getResourceAsStream("/chatte/ui/fx/OpenSansEmoji.ttf"), hist.resolve("OpenSansEmoji.ttf")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			String histFileName = new SimpleDateFormat("'ChatLog_'yyyyMMdd_HHmmss'.html'").format(now); //$NON-NLS-1$
-			String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now); //$NON-NLS-1$
+			String histFileName = new SimpleDateFormat("'ChatLog_'yyyyMMdd'.html'").format(now); //$NON-NLS-1$
+			// String timestamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(now); //$NON-NLS-1$
 			Path path = hist.resolve(histFileName);
 			BufferedWriter bufferedWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 			writer = new PrintWriter(bufferedWriter);
-			writer.println("<!DOCTYPE html>\n" +  //$NON-NLS-1$
-					"<html>\n" +  //$NON-NLS-1$
-					"<head>\n" +  //$NON-NLS-1$
-					"<meta charset=\"utf-8\" />\n" + //$NON-NLS-1$ 
-					"<title>ChatteFX - Conversation log "+timestamp+"</title>\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
-					"<style>\n" + //$NON-NLS-1$
-					"@font-face {\n" +  //$NON-NLS-1$
-					"    font-family: 'OpenSansEmoji';\n" + //$NON-NLS-1$ 
-					"    src: url('OpenSansEmoji.ttf');\n" +  //$NON-NLS-1$
-					"}\n" + //$NON-NLS-1$
-					"</style>\n" +  //$NON-NLS-1$
-					"<link rel=\"stylesheet\" href=\"ChatView.css\" />\n" + //$NON-NLS-1$ 
-					"</head>\n" +  //$NON-NLS-1$
-					"<body>\n" +  //$NON-NLS-1$
-					"<h1>Welcome Grande Chato</h1>\n" + //$NON-NLS-1$ 
-					"<div id=\"msglist\">"); //$NON-NLS-1$
+//			writer.println("<!DOCTYPE html>\n" +  //$NON-NLS-1$
+//					"<html>\n" +  //$NON-NLS-1$
+//					"<head>\n" +  //$NON-NLS-1$
+//					"<meta charset=\"utf-8\" />\n" + //$NON-NLS-1$ 
+//					"<title>ChatteFX - Conversation log "+timestamp+"</title>\n" + //$NON-NLS-1$ //$NON-NLS-2$ 
+//					"<style>\n" + //$NON-NLS-1$
+//					"@font-face {\n" +  //$NON-NLS-1$
+//					"    font-family: 'OpenSansEmoji';\n" + //$NON-NLS-1$ 
+//					"    src: url('OpenSansEmoji.ttf');\n" +  //$NON-NLS-1$
+//					"}\n" + //$NON-NLS-1$
+//					"</style>\n" +  //$NON-NLS-1$
+//					"<link rel=\"stylesheet\" href=\"ChatView.css\" />\n" + //$NON-NLS-1$ 
+//					"</head>\n" +  //$NON-NLS-1$
+//					"<body>\n" +  //$NON-NLS-1$
+//					"<h1>Welcome Grande Chato</h1>\n" + //$NON-NLS-1$ 
+//					"<div id=\"msglist\">"); //$NON-NLS-1$
 		} catch(Exception e) {
 			throw new RuntimeException("Failed to setup chat history", e); //$NON-NLS-1$
 		}
@@ -104,25 +121,19 @@ public class HistoryLoggerImpl implements HistoryLogger {
 
 	@MessageListener
 	public void closeHistory(final StopServicesMessage message) {
+		httpService.shutdown(message);
 		closeHistoryFile();
 	}
 	
 	
 	private void closeHistoryFile() {
-		writer.println("</div></body></html>"); //$NON-NLS-1$
+//		writer.println("</div></body></html>"); //$NON-NLS-1$
 		writer.close();
 	}
 
 	@Override
 	public void recordMessage(String message, Set<String> resources) {
-		// TODO Auto-generated method stub
-		String fixedMessage = message;
-		if(resources != null && !resources.isEmpty()) {
-			for(String resourceCode : resources) {
-				String resourceName = resourceManager.getResourceFile(resourceCode).getName();
-				fixedMessage = fixedMessage.replace("\"chato:"+resourceCode+"\"", "\"../toybox/"+resourceName+"\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}
-		}
+		String fixedMessage = message.replace("chato:",""); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.println("<div>"+fixedMessage+"</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

@@ -30,4 +30,5 @@ public interface HistoryLogger {
 
 	void recordMessage(String message, Set<String> resources);
 	
+	String getServiceUrl();
 }
