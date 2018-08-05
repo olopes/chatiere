@@ -24,11 +24,9 @@
  */
 package chatte.ui.fx;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ProxySelector;
 import java.net.URL;
-import java.security.KeyStore;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -105,6 +103,7 @@ public class ChatteFX extends Application {
 
 	@Override
 	public void init() throws Exception {
+		Fx.FX_RUNNING=true;
 		super.init();
 
 		// Application.Parameters parameters = getParameters();

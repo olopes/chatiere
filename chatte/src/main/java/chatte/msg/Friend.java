@@ -52,14 +52,14 @@ public class Friend implements Serializable {
 		nickProperty = new ReadOnlyStringWrapper();
 		colorProperty = new ReadOnlyStringWrapper();
 	}
-	
+
 	public String getNick() {
 		return nick;
 	}
 
 	public void setNick(String nick) {
 		this.nick = nick;
-		// Fx.setInFxThread(this.nickProperty, nick);
+		Fx.setInFxThread(this.nickProperty, nick);
 	}
 
 	public String getHost() {
@@ -118,6 +118,7 @@ public class Friend implements Serializable {
 		return new StringBuilder(getNick()).append(" [").append(getHost()).append("]").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
+	@XmlTransient
 	public boolean isMyself() {
 		return false;
 	}

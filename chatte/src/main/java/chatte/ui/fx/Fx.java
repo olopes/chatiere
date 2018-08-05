@@ -29,9 +29,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 
 public class Fx {
+	
+	public static boolean FX_RUNNING=false;
 
 	public static void setInFxThread(final StringProperty prop, final String value) {
-		if (Platform.isFxApplicationThread())
+		if (!FX_RUNNING || Platform.isFxApplicationThread())
 			prop.set(value);
 		else
 			Platform.runLater(new Runnable() {
@@ -43,7 +45,7 @@ public class Fx {
 	}
 
 	public static void setInFxThread(final BooleanProperty prop, final boolean value) {
-		if (Platform.isFxApplicationThread())
+		if (!FX_RUNNING || Platform.isFxApplicationThread())
 			prop.set(value);
 		else
 			Platform.runLater(new Runnable() {
